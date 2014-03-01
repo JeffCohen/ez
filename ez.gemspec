@@ -7,9 +7,9 @@ Gem::Specification.new do |spec|
   spec.name          = "ez"
   spec.version       = Ez::VERSION
   spec.authors       = ["Jeff Cohen"]
-  spec.email         = ["jeff@starterleague.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.email         = ["cohen.jeff@gmail.com"]
+  spec.description   = "Gem for easier Rails development."
+  spec.summary       = "For educational purposes only."
   spec.homepage      = ""
   spec.license       = "MIT"
 
