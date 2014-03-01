@@ -1,34 +1,29 @@
-class DbModifier
+class SchemaModifier
 
   attr_reader :db, :spec
 
-  def initialize
-    ActiveRecord::Base.establish_connection({
-      adapter:  'sqlite3',
-      database: "db/development.sqlite3",
-    })
-    @db = ActiveRecord::Base.connection
-    ActiveRecord::Migration.verbose = false
-    load_models_yml
+  def initialize(model_spec)
+    @spec = model_spec
+    connect_to_database
+  end
+
+  def self.migrate(model_spec)
+    self.new(model_spec).migrate
   end
 
   def migrate
     @changed = false
+
     add_missing_schema
     remove_dead_schema
+    update_schema_version
+
     puts "Everything is up-to-date." unless @changed
   end
 
+
   def tables
     @tables ||= (db.tables - ['schema_migrations'])
-  end
-
-  def has_model?(model_name)
-    has_table?(model_name.tableize)
-  end
-
-  def has_table?(name)
-    tables.index(name).present?
   end
 
   def missing_model?(model_name)
@@ -116,6 +111,11 @@ class DbModifier
     end
   end
 
+  def update_schema_version
+    @db.initialize_schema_migrations_table
+    @db.assume_migrated_upto_version(Time.now.strftime("%Y%m%d%H%M%S"))
+  end
+
   def remove_dead_tables
     tables_we_need = @spec.keys.map { |model| model.tableize }
     dead_tables = tables - tables_we_need
@@ -129,21 +129,16 @@ class DbModifier
     end
   end
 
-  def load_models_yml
-    @spec = YAML.load_file('db/models.yml')
-    @spec ||= {}
-
-    @spec.each do |model, columns|
-      @spec[model] = []
-      columns.each do |column|
-        if column.is_a?(String) || column.is_a?(Symbol)
-          @spec[model] << { column.to_s => 'string' }
-        elsif column.is_a?(Hash) && column.keys.count == 1
-          @spec[model] << { column.keys.first.to_s => column.values.first.to_s }
-        else
-          raise "Bad syntax."
-        end
-      end
-    end
+  def silence_migration_output
+    ActiveRecord::Migration.verbose = false
   end
+
+  def connect_to_database
+    ActiveRecord::Base.establish_connection({
+      adapter:  'sqlite3',
+      database: "db/development.sqlite3",
+    })
+    @db = ActiveRecord::Base.connection
+  end
+
 end

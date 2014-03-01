@@ -2,6 +2,7 @@ require "ez/version"
 require 'ez/dispatcher.rb'
 require 'ez/mapper.rb'
 require 'ez/apis.rb'
+require 'ez/domain_modeler.rb'
 
 module Ez
   class MyRailtie < Rails::Railtie

@@ -1,5 +1,3 @@
-require_relative 'db_modifier'
-
 namespace :ez do
 
   desc "Reset the database scheme from scratch."
@@ -9,10 +7,15 @@ namespace :ez do
   desc "Automatically update the database schema and model files."
   task :tables => :environment do
     if File.exists?('db/models.yml')
-      db = DbModifier.new
-      db.migrate
+      DomainModeler.update_tables
+      Rake::Task["db:schema:dump"].invoke
     else
-      puts "To get started, edit the db/models.yml file to describe your table schema."
+      emit_help_page
+    end
+  end
+
+  def emit_help_page
+    puts "To get started, edit the db/models.yml file to describe your table schema."
       File.open("db/models.yml", "w") do |f|
         f.puts <<-EOS
 # Example table for a typical Book model.
@@ -29,7 +32,5 @@ namespace :ez do
 # You can have as many models as you want in this file.
 EOS
       end
-    end
   end
-
 end
