@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["cohen.jeff@gmail.com"]
   spec.description   = "Gem for easier Rails development."
   spec.summary       = "For educational purposes only."
-  spec.homepage      = ""
+  spec.homepage      = "http://www.jeffcohenonline.com/ez"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
@@ -19,5 +19,5 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 1.3"
-  spec.add_development_dependency "rake"
+  spec.add_development_dependency "rake", '~> 10.0', '>= 10.0.0'
 end
