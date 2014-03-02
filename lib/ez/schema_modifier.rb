@@ -46,7 +46,7 @@ class SchemaModifier
 
   def display_change(message)
     puts message
-    @change = true
+    @changed = true
   end
 
   def add_missing_columns(model_name, columns)
