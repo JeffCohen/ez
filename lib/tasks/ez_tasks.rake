@@ -1,22 +1,8 @@
 namespace :ez do
 
-  desc "Reset the database scheme from scratch."
-  task :reset_tables => ['db:drop', :tables] do
-  end
-
-  desc "Automatically update the database schema and model files."
-  task :tables => :environment do
-    if File.exists?('db/models.yml')
-      DomainModeler.update_tables
-      Rake::Task["db:schema:dump"].invoke
-    else
-      emit_help_page
-    end
-  end
-
-  def emit_help_page
-    puts "To get started, edit the db/models.yml file to describe your table schema."
-      File.open("db/models.yml", "w") do |f|
+  desc "Generate models.yml if it doesn't exist yet."
+  task :generate_yml do
+    File.open("db/models.yml", "w") do |f|
         f.puts <<-EOS
 # Example table for a typical Book model.
 #
@@ -32,5 +18,26 @@ namespace :ez do
 # You can have as many models as you want in this file.
 EOS
       end
+  end
+
+  desc "Reset the database schema and data from scratch."
+  task :reset_tables => ['db:drop', :tables] do
+  end
+
+
+  desc "Attempts to update the database schema and model files with minimal data loss."
+  task :tables => :environment do
+    if File.exists?('db/models.yml')
+      DomainModeler.update_tables
+      Rake::Task["db:schema:dump"].invoke
+    else
+      emit_help_page
+      Rake::Task["generate_yml"].invoke
+    end
+  end
+
+  def emit_help_page
+    puts "To get started, edit the db/models.yml file to describe your table schema."
+
   end
 end
