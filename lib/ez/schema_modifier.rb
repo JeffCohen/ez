@@ -56,11 +56,11 @@ class SchemaModifier
       col_type = column[col_name]
       if db.column_exists?(table_name, col_name.to_sym)
         unless db.column_exists?(table_name, col_name.to_sym, col_type.to_sym)
-          display_change "Detected new column type for '#{col_name}' to #{col_type}"
+          display_change "Changing column type for '#{col_name}' to #{col_type}"
           db.change_column(table_name, col_name.to_sym, col_type.to_sym)
         end
       else
-        display_change "Detected new column '#{col_name}' as #{col_type} for model #{model_name}"
+        display_change "Adding new column '#{col_name}' as #{col_type} for model #{model_name}"
         db.add_column(table_name, col_name.to_sym, col_type.to_sym)
       end
     end
@@ -76,12 +76,12 @@ class SchemaModifier
           col_type = column[name]
           t.send(col_type, name)
         end
-        t.timestamps
+        # t.timestamps
       end
     end
     filename = "app/models/#{model_name.underscore}.rb"
     unless File.exists?(filename)
-      display_change "Creating model file: #{filename}"
+      display_change "Creating new model file: #{filename}"
       File.open(filename, "w") do |f|
         f.puts "class #{model_name} < ActiveRecord::Base"
         f.puts "end"
@@ -104,7 +104,7 @@ class SchemaModifier
         end
         dead_columns = columns - spec_columns
         if dead_columns.any?
-          display_change "Detected unused columns: #{dead_columns.to_sentence} for model #{model_name}"
+          display_change "Removing unused columns: #{dead_columns.to_sentence} for model #{model_name}"
           db.remove_columns(table_name, *dead_columns)
         end
       end

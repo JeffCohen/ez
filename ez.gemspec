@@ -5,7 +5,7 @@ require 'ez/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "ez"
-  spec.version       = Ez::VERSION
+  spec.version       = EZ::VERSION
   spec.authors       = ["Jeff Cohen"]
   spec.email         = ["cohen.jeff@gmail.com"]
   spec.description   = "Gem for easier Rails development."
@@ -17,6 +17,8 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = []
   spec.require_paths = ["lib"]
+
+  spec.add_runtime_dependency 'hirb'
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake", '~> 10.0', '>= 10.0.0'

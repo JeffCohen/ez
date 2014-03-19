@@ -1,3 +1,3 @@
-module Ez
-  VERSION = "0.0.3"
+module EZ
+  VERSION = "0.5.0"
 end
