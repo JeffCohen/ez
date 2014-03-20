@@ -11,6 +11,29 @@ module EZ
     rake_tasks do
       load "tasks/ez_tasks.rake"
     end
+    console do
+      Hirb.enable if defined?(Hirb)
+
+      I18n.enforce_available_locales = false
+      puts "Welcome to the Rails Console."
+      puts "-" * 60
+      puts
+      tables = ActiveRecord::Base.connection.tables - ['schema_migrations']
+      models = tables.map { |t| t.classify }
+      if models.any?
+        puts "Use this console to add, update, and delete rows from the database."
+        puts
+        puts "Models: #{models.to_sentence}"
+        puts
+        puts "HINTS: "
+        puts "* Type 'exit' (or press Ctrl-D) to when you're done."
+        puts "* Press Ctrl-C if things seem to get stuck."
+        puts "* Use the up/down arrows to repeat commands."
+        puts "* Type the name of a Model to see what columns it has." if models.any?
+        puts
+      end
+
+    end
 
     initializer "ez" do
       module ::Hirb

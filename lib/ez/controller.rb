@@ -2,20 +2,20 @@ module ActionController
   class Base
 
     helper_method :current_user
-    helper_method :logged_in?
+    helper_method :user_signed_in?
 
-    def logged_in?
+    def user_signed_in?
       session[:user_id].present?
     end
 
-    def user_login(user)
+    def sign_in_as(user)
       @current_user = user
-      session[:user_id] = user ? user.id : nil
+      session[:user_id] = user.try(:id)
       user
     end
 
-    def user_logout
-      user_login nil
+    def sign_out
+      sign_in_as nil
     end
 
     def current_user(klass = User)
