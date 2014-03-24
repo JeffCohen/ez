@@ -28,7 +28,7 @@ EOS
   desc "Attempts to update the database schema and model files with minimal data loss."
   task :tables => :environment do
     if File.exists?('db/models.yml')
-      DomainModeler.update_tables
+      EZ::DomainModeler.update_tables
       Rake::Task["db:schema:dump"].invoke
     else
       emit_help_page
