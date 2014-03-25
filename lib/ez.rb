@@ -4,7 +4,8 @@ require 'ez/mapper.rb'
 require 'ez/apis.rb'
 require 'ez/domain_modeler.rb'
 require 'ez/controller.rb'
-require 'ez/model.rb'
+require 'ez/controller.rb'
+require 'ez/view_helpers.rb'
 
 module EZ
   class Railtie < Rails::Railtie
@@ -36,6 +37,11 @@ module EZ
     end
 
     initializer "ez" do
+
+      ActiveSupport.on_load :action_view do
+        include EZ::ViewHelpers
+      end
+
       module ::Hirb
         # A Formatter object formats an output object (using Formatter.format_output) into a string based on the views defined
         # for its class and/or ancestry.
