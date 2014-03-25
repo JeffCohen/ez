@@ -4,7 +4,7 @@ require 'ez/mapper.rb'
 require 'ez/apis.rb'
 require 'ez/domain_modeler.rb'
 require 'ez/controller.rb'
-require 'ez/controller.rb'
+require 'ez/model.rb'
 require 'ez/view_helpers.rb'
 
 module EZ
