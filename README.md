@@ -32,7 +32,7 @@ gem 'ez', group: 'development'
 * Easier JSON API calls by calling `EZ.from_api(url)`; returns parsed Ruby hash (or array, etc.)
 * Built-in `EZ.weather(location)` for classroom demo of API, to get quick hash and avoid JSON explanation.  (Relies on http://openweathermap.org)
 * Adds controller and view helpers `current_user`, `user_signed_in?`, `sign_in_as`, and `sign_out` to avoid cookies/session hash details
-* Built-in `map` helper method to display a static map of any address. Example: `map('Millenium Park, Chicago, IL')`
+* Adds view helper `map` to display a quick static map of any address. Example: `<%= map('Millenium Park, Chicago, IL') %>`
 
 
 
