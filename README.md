@@ -2,6 +2,12 @@
 
 For educational purposes only.  Makes Rails a bit more beginner-friendly.
 
+## Usage
+
+```ruby
+gem 'ez', group: 'development'
+```
+
 ### Console Enhancements
 
 * Fixes the "no connection" message in Rails >= 4.0.1 (if you try to inspect a model without making a query first) by establishing an initial connection to the development database.
