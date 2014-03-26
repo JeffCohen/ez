@@ -15,7 +15,7 @@ gem 'ez', group: 'development'
 * Fixes the "no connection" message in Rails >= 4.0.1 (if you try to inspect a model without making a query first) by establishing an initial connection to the development database.
 * Shows helpful instructions when console starts, including the list of model classes found in the application.
 * Uses Hirb for table-like display. (Depends on Hirb ~> 0.7.1)
-* Patches Hirb to allow nice table output for `ActiveRecord::Relation` lists (i.e. result of `.all`, `.where`)` but hash-like output for single ActiveRecord objects, such as the result of `.find_by(:title => 'Apollo 13')`.
+* Patches Hirb to allow nice table output for `ActiveRecord::Relation` lists (i.e. result of `.all`, `.where`)` and hash-like output for single ActiveRecord objects, such as the result of `.find_by(:title => 'Apollo 13')`.
 
 ### 2. Route Enhancements
 
