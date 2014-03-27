@@ -1,6 +1,10 @@
 module EZ
   module ViewHelpers
 
+    def weather(location = 'Evanston, IL')
+      EZ.weather(location)
+    end
+
     def map(location, options = {})
       defaults = { :zoom => 12, :scale => 1, :size => '400x400', :type => 'hybrid', :sensor => false}
       parameters = defaults.merge(options)

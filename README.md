@@ -30,7 +30,7 @@ gem 'ez', group: 'development'
 ### 4. Controller and View Enhancements
 
 * Easier JSON API calls by calling `EZ.from_api(url)`; returns parsed Ruby hash (or array, etc.)
-* Built-in `EZ.weather(location)` for classroom demo of API, to get quick hash and avoid JSON explanation.  (Relies on http://openweathermap.org)
+* Built-in view helper `<%= weather %>` and `EZ.weather` for classroom demo of a JSON API, to get quick hash and avoid gory details.  (Relies on http://openweathermap.org).  Default location is Evanston.  Can pass location: `<%= weather('San Diego, CA') %>`.  The `<%= weather %>` helper just delegates to `EZ.weather`.
 * Adds controller and view helpers `current_user`, `user_signed_in?`, `sign_in_as`, and `sign_out` to avoid cookies/session hash details
 * Adds view helper `map` to display a quick static map of any address. Example: `<%= map('Millenium Park, Chicago, IL') %>`
 
