@@ -23,6 +23,7 @@ gem 'ez', group: 'development'
 
 ### 3. Model Enhancements
 
+* Run `rake ez:generate_yml` to generate a file named `db/models.yml`.  It will have some self-documenting comments inside of it.
 * Enables instant modeling without migrations via `models.yml` and `rake ez:tables`.  If things get messed up, use `rake ez:reset_tables` to drop the entire db first.
 * Adds ActiveRecord::Base `.read` method to provide symmetry with `.create`, `.update`, and `.delete`
 * Adds ActiveRecord::Base `.sample` method to choose a random row
