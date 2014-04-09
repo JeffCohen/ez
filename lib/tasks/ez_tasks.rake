@@ -32,7 +32,7 @@ EOS
       Rake::Task["db:schema:dump"].invoke
     else
       emit_help_page
-      Rake::Task["generate_yml"].invoke
+      Rake::Task["ez:generate_yml"].invoke
     end
   end
 
