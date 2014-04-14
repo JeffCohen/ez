@@ -62,6 +62,8 @@ module EZ
           end
         else
           display_change "Adding new column '#{col_name}' as #{col_type} for model #{model_name}"
+          options = {}
+          options[:default] = false if col_type.to_sym == :boolean
           db.add_column(table_name, col_name.to_sym, col_type.to_sym)
         end
       end
@@ -75,7 +77,9 @@ module EZ
           columns.each do |column|
             name = column.keys.first
             col_type = column[name]
-            t.send(col_type, name)
+            options = {}
+            options[:default] = false if col_type.to_sym == :boolean
+            t.send(col_type, name, options)
           end
           # t.timestamps
         end
