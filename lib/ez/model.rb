@@ -4,8 +4,10 @@ class ActiveRecord::Base
     "#<#{self.class.name} #{attributes}>"
   end
 
-  def self.read(args)
-    if args.is_a?(Integer)
+  def self.read(args = nil)
+    if args.nil?
+      all
+    elsif args.is_a?(Integer)
       find_by(id: args)
     elsif args.is_a?(String) && args.to_i > 0 && !args.index(' ')
       find_by(id: args)
