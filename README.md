@@ -25,6 +25,10 @@ gem 'ez', group: 'development'
 
 * Run `rake ez:generate_yml` to generate a file named `db/models.yml`.  It will have some self-documenting comments inside of it.  This file is also automatically generated if you run `rake ez:tables` without an existing `models.yml` first.
 * Enables instant modeling without migrations via `models.yml` and `rake ez:tables`.  If things get messed up, use `rake ez:reset_tables` to drop the entire db first.
+* Columns default to type `string` if none is provided and the column name doesn't have a recognized suffix.
+* Column names ending in `_id` are assumed to be of type `integer`.
+* Column names ending in `_at` are assumed to be of type `datetime`.
+* Column names ending in `_on` are assumed to be of type `date`.
 * Adds ActiveRecord::Base `.read` method to provide symmetry with `.create`, `.update`, and `.delete`
 * Adds ActiveRecord::Base `.sample` method to choose a random row.
 
@@ -34,6 +38,3 @@ gem 'ez', group: 'development'
 * Built-in view helper `<%= weather %>` and `EZ.weather` for classroom demo of a JSON API, to get quick hash and avoid gory details.  (Relies on http://openweathermap.org).  Default location is Evanston.  Can pass location: `<%= weather('San Diego, CA') %>`.  The `<%= weather %>` helper just delegates to `EZ.weather`.
 * Adds controller and view helpers `current_user`, `user_signed_in?`, `sign_in_as`, and `sign_out` to avoid cookies/session hash details
 * Adds view helper `map` to display a quick static map of any address. Example: `<%= map('Millenium Park, Chicago, IL') %>`
-
-
-
