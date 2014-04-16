@@ -29,6 +29,7 @@ gem 'ez', group: 'development'
 * Column names ending in `_id` are assumed to be of type `integer`.
 * Column names ending in `_at` are assumed to be of type `datetime`.
 * Column names ending in `_on` are assumed to be of type `date`.
+* Boolean columns are assumed to be given a default of `false`.
 * Adds ActiveRecord::Base `.read` method to provide symmetry with `.create`, `.update`, and `.delete`
 * Adds ActiveRecord::Base `.sample` method to choose a random row.
 
