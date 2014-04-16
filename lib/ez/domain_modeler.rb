@@ -23,7 +23,15 @@ module EZ
         @spec[model] = []
         columns.each do |column|
           if column.is_a?(String) || column.is_a?(Symbol)
-            @spec[model] << { column.to_s => 'string' }
+            if column.to_s =~ /_id$/
+              @spec[model] << { column.to_s => 'integer' }
+            elsif column.to_s =~ /_at$/
+              @spec[model] << { column.to_s => 'datetime' }
+            elsif column.to_s =~ /_on$/
+              @spec[model] << { column.to_s => 'date' }
+            else
+              @spec[model] << { column.to_s => 'string' }
+            end
           elsif column.is_a?(Hash) && column.keys.count == 1
             @spec[model] << { column.keys.first.to_s => column.values.first.to_s }
           else
