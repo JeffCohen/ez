@@ -1,3 +1,3 @@
 module EZ
-  VERSION = "0.8.0"
+  VERSION = "0.8.6"
 end

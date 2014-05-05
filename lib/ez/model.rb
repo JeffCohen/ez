@@ -1,5 +1,15 @@
 class ActiveRecord::Base
 
+  def self.magic_associations
+    x = self.column_names.select { |n| n.ends_with? '_id' }
+
+    x.each do |fk|
+      assoc_name = fk[0, fk.length - 3]
+      belongs_to assoc_name.to_sym
+      assoc_name.classify.constantize.send(:has_many, self.name.underscore.pluralize.to_sym, dependent: :destroy)
+    end
+  end
+
   def inspect
     "#<#{self.class.name} #{attributes}>"
   end

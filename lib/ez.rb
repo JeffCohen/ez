@@ -6,14 +6,17 @@ require 'ez/domain_modeler.rb'
 require 'ez/controller.rb'
 require 'ez/model.rb'
 require 'ez/view_helpers.rb'
+require 'hirb'
 
 module EZ
   class Railtie < Rails::Railtie
     rake_tasks do
       load "tasks/ez_tasks.rake"
     end
+
     console do
       Hirb.enable if defined?(Hirb)
+
 
       I18n.enforce_available_locales = false
       puts "Welcome to the Rails Console."
@@ -26,7 +29,7 @@ module EZ
         puts
         puts "Models: #{models.to_sentence}"
         puts
-        puts "HINTS: "
+        puts "HINTS:"
         puts "* Type 'exit' (or press Ctrl-D) to when you're done."
         puts "* Press Ctrl-C if things seem to get stuck."
         puts "* Use the up/down arrows to repeat commands."
@@ -41,6 +44,14 @@ module EZ
       ActiveSupport.on_load :action_view do
         include EZ::ViewHelpers
       end
+
+      # tables = ActiveRecord::Base.connection.tables - ['schema_migrations']
+      # models.each { |m| m.constantize.magic_associations }
+      # Rails.application.routes.draw do
+      #   tables.each do |table_name|
+      #     resources table_name.to_sym
+      #   end
+      # end
 
       module ::Hirb
         # A Formatter object formats an output object (using Formatter.format_output) into a string based on the views defined
