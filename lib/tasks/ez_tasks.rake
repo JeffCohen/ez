@@ -29,7 +29,7 @@ EOS
   task :tables => :environment do
     if File.exists?('db/models.yml')
       EZ::DomainModeler.update_tables
-      Rake::Task["db:schema:dump"].invoke
+      Rake::Task["db:schema:dump"].invoke unless Rails.env.production?
     else
       emit_help_page
       Rake::Task["ez:generate_yml"].invoke

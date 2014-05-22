@@ -85,7 +85,7 @@ module EZ
         end
       end
       filename = "app/models/#{model_name.underscore}.rb"
-      unless File.exists?(filename)
+      unless Rails.env.production? || File.exists?(filename)
         display_change "Creating new model file: #{filename}"
         File.open(filename, "w") do |f|
           f.puts "class #{model_name} < ActiveRecord::Base"
@@ -139,10 +139,7 @@ module EZ
     end
 
     def connect_to_database
-      ActiveRecord::Base.establish_connection({
-        adapter:  'sqlite3',
-        database: "db/development.sqlite3",
-      })
+      ActiveRecord::Base.establish_connection
       @db = ActiveRecord::Base.connection
     end
 
