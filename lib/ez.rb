@@ -1,12 +1,14 @@
 require "ez/version"
-require 'ez/dispatcher.rb'
-require 'ez/mapper.rb'
+# require 'ez/dispatcher.rb'
+# require 'ez/mapper.rb'
+# require 'ez/controller.rb'
+
 require 'ez/apis.rb'
 require 'ez/domain_modeler.rb'
-# require 'ez/controller.rb'
 require 'ez/model.rb'
 require 'ez/view_helpers.rb'
-require 'hirb'
+
+require 'hirb' if Rails.env.development?
 
 module EZ
   class Railtie < Rails::Railtie

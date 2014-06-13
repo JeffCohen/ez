@@ -35,7 +35,7 @@ module EZ
           elsif column.is_a?(Hash) && column.keys.count == 1
             @spec[model] << { column.keys.first.to_s => column.values.first.to_s }
           else
-            raise "Bad syntax."
+            raise "Bad syntax around `#{column.inspect}`"
           end
         end
       end
