@@ -17,9 +17,18 @@ module EZ
 
       add_missing_schema
       remove_dead_schema
-      update_schema_version
 
-      puts "Everything is up-to-date." unless @changed
+      if @changed
+        update_schema_version
+      else
+        puts "Everything is up-to-date."
+      end
+
+      return @changed
+
+      rescue => e
+        puts e.message
+        false
     end
 
 
@@ -109,7 +118,9 @@ module EZ
           end
           dead_columns = columns - spec_columns
           if dead_columns.any?
-            display_change "Removing unused columns: #{dead_columns.to_sentence} for model #{model_name}"
+            dead_columns.each do |dead_column_name|
+              display_change "Removing unused column '#{dead_column_name}' from model '#{model_name}'"
+            end
             db.remove_columns(table_name, *dead_columns)
           end
         end
@@ -118,7 +129,7 @@ module EZ
 
     def update_schema_version
       @db.initialize_schema_migrations_table
-      @db.assume_migrated_upto_version(Time.now.strftime("%Y%m%d%H%M%S"))
+      @db.assume_migrated_upto_version(Time.now.utc.strftime("%Y%m%d%H%M%S"))
     end
 
     def remove_dead_tables

@@ -2,7 +2,9 @@ namespace :ez do
 
   desc "Generate models.yml if it doesn't exist yet."
   task :generate_yml do
-    File.open("db/models.yml", "w") do |f|
+    filename = "db/models.yml"
+    unless File.exist?(filename)
+      File.open(filename, "w") do |f|
         f.puts <<-EOS
 # Example table for a typical Book model.
 #
@@ -18,26 +20,27 @@ namespace :ez do
 # You can have as many models as you want in this file.
 EOS
       end
+    end
   end
 
-  desc "Reset the database schema and data from scratch."
+  desc "Erases all data, and builds all table schema from scratch."
   task :reset_tables => ['db:drop', :tables] do
   end
 
 
   desc "Attempts to update the database schema and model files with minimal data loss."
-  task :tables => :environment do
+  task :tables => ['db:migrate'] do
     if File.exists?('db/models.yml')
-      EZ::DomainModeler.update_tables
-      Rake::Task["db:schema:dump"].invoke unless Rails.env.production?
+      if EZ::DomainModeler.update_tables
+        Rake::Task["db:schema:dump"].invoke unless Rails.env.production?
+      end
     else
-      emit_help_page
       Rake::Task["ez:generate_yml"].invoke
+      emit_help_page
     end
   end
 
   def emit_help_page
-    puts "To get started, edit the db/models.yml file to describe your table schema."
-
+    puts "You can now edit the db/models.yml file to describe your table schema."
   end
 end

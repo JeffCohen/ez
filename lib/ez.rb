@@ -16,9 +16,8 @@ module EZ
       load "tasks/ez_tasks.rake"
     end
 
-    console do
-      Hirb.enable if Rails.env.development? && defined?(Hirb)
-      # context.back_trace_limit = 0
+    console do |app|
+      Hirb.enable(pager: false) if Rails.env.development? && defined?(Hirb)
 
       I18n.enforce_available_locales = false
       puts "Welcome to the Rails Console."
