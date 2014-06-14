@@ -29,7 +29,7 @@ EOS
 
 
   desc "Attempts to update the database schema and model files with minimal data loss."
-  task :tables => ['db:migrate'] do
+  task :tables => [:environment, 'db:migrate'] do
     if File.exists?('db/models.yml')
       if EZ::DomainModeler.update_tables
         Rake::Task["db:schema:dump"].invoke unless Rails.env.production?

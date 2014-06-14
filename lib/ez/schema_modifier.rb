@@ -59,40 +59,46 @@ module EZ
       @changed = true
     end
 
-    def add_missing_columns(model_name, columns)
+    def add_missing_columns(model_name, columns, assume_missing = false)
       table_name = model_name.tableize
       columns.each do |column|
         col_name = column.keys.first
         col_type = column[col_name]
-        if db.column_exists?(table_name, col_name.to_sym)
+        if !assume_missing && db.column_exists?(table_name, col_name.to_sym)
           unless db.column_exists?(table_name, col_name.to_sym, col_type.to_sym)
             display_change "Changing column type for '#{col_name}' to #{col_type}"
             db.change_column(table_name, col_name.to_sym, col_type.to_sym)
           end
         else
-          display_change "Adding new column '#{col_name}' as #{col_type} for model #{model_name}"
+          if !assume_missing
+            display_change "Adding new column '#{col_name}' as #{col_type} for model #{model_name}"
+          end
           options = {}
           options[:default] = false if col_type.to_sym == :boolean
-          db.add_column(table_name, col_name.to_sym, col_type.to_sym)
+          db.add_column(table_name, col_name.to_sym, col_type.to_sym, options)
+          if col_name.to_s =~ /_id$/
+            display_change "  (adding foreign_key index for '#{col_name}')"
+            db.add_index table_name, col_name.to_sym
+          end
         end
       end
     end
 
     def add_model(model_name, columns)
       table_name = model_name.tableize
-      display_change "Defining model #{model_name}..."
-      ActiveRecord::Schema.define do
-        create_table table_name do |t|
-          columns.each do |column|
-            name = column.keys.first
-            col_type = column[name]
-            options = {}
-            options[:default] = false if col_type.to_sym == :boolean
-            t.send(col_type, name, options)
-          end
-          # t.timestamps
-        end
-      end
+      display_change "Defining new table for model '#{model_name}'."
+      db.create_table table_name
+      add_missing_columns model_name, columns, true
+      #     columns.each do |column|
+      #       name = column.keys.first
+      #       col_type = column[name]
+      #       options = {}
+      #       options[:default] = false if col_type.to_sym == :boolean
+      #       t.send(col_type, name, options)
+      #     end
+      #     # t.timestamps
+      #   end
+      # end
       filename = "app/models/#{model_name.underscore}.rb"
       unless Rails.env.production? || File.exists?(filename)
         display_change "Creating new model file: #{filename}"
@@ -128,8 +134,8 @@ module EZ
     end
 
     def update_schema_version
-      @db.initialize_schema_migrations_table
-      @db.assume_migrated_upto_version(Time.now.utc.strftime("%Y%m%d%H%M%S"))
+      db.initialize_schema_migrations_table
+      db.assume_migrated_upto_version(Time.now.utc.strftime("%Y%m%d%H%M%S"))
     end
 
     def remove_dead_tables
