@@ -23,7 +23,7 @@ module EZ
         @spec[model] = []
         columns.each do |column|
           if column.is_a?(String) || column.is_a?(Symbol)
-            if column.to_s =~ /_id$/
+            if column.to_s =~ /_id$/ || column.to_s =~ /_count$/
               @spec[model] << { column.to_s => 'integer' }
             elsif column.to_s =~ /_at$/
               @spec[model] << { column.to_s => 'datetime' }

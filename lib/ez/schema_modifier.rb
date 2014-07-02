@@ -68,6 +68,10 @@ module EZ
           unless db.column_exists?(table_name, col_name.to_sym, col_type.to_sym)
             display_change "Changing column type for '#{col_name}' to #{col_type}"
             db.change_column(table_name, col_name.to_sym, col_type.to_sym)
+            if col_name.to_s =~ /_id$/
+              display_change "  (adding foreign_key index for '#{col_name}')"
+              db.add_index table_name, col_name.to_sym
+            end
           end
         else
           if !assume_missing
