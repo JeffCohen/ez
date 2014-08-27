@@ -9,8 +9,8 @@ module EZ
       connect_to_database
     end
 
-    def self.migrate(model_spec)
-      self.new(model_spec).migrate
+    def self.migrate(model_spec, silent = false)
+      self.new(model_spec, silent).migrate
     end
 
     def migrate
@@ -22,7 +22,7 @@ module EZ
       if @changed
         update_schema_version
       else
-        puts "Everything is up-to-date."
+        puts "All tables are up-to-date."
       end
 
       return @changed
@@ -56,7 +56,7 @@ module EZ
     end
 
     def display_change(message)
-      puts message
+      puts message unless @silent
       @changed = true
     end
 
@@ -139,10 +139,26 @@ module EZ
 
       dead_tables.each do |table_name|
         model_name = table_name.classify
+        display_change "Yo"
         display_change "Dropping model #{model_name}"
         db.drop_table(table_name)
-        display_change "Deleting file #{model_name.underscore}.rb"
-        File.unlink "app/models/#{model_name.underscore}.rb" rescue nil
+        begin
+          filename = "app/models/#{model_name.underscore}.rb"
+          code = IO.read(filename)
+          matched = IO.read(filename) =~ /\s*class #{model_name} < ActiveRecord::Base\s+end\s*/
+
+          display_change "-" * 20
+          display_change matched
+          display_change code
+          display_change "-" * 20
+
+          if matched
+            display_change "Deleting file #{filename}"
+            File.unlink(filename)
+          end
+        rescue => e
+          display_change "Could not delete old model #{model_name.underscore}.rb."
+        end
       end
     end
 
