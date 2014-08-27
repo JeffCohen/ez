@@ -1,4 +1,7 @@
 module EZ
+
+  # The SchemaModifier class receives a DomainModeler specification
+  # and applies any necessary db schema changes.
   class SchemaModifier
 
     attr_reader :db, :spec
@@ -29,6 +32,7 @@ module EZ
 
       rescue => e
         puts e.message
+        puts e.backtrace.first
         false
     end
 
@@ -62,28 +66,33 @@ module EZ
 
     def add_missing_columns(model_name, columns, assume_missing = false)
       table_name = model_name.tableize
-      # {"nickname"=>{:type=>"string", :default=>nil}, "password_digest"=>{:type=>"string", :default=>nil}, "created_at"=>{:type=>"datetime", :default=>nil}, "updated_at"=>{:type=>"datetime", :default=>nil}, "course_id"=>{:type=>"integer", :default=>"(0)"}, "email"=>{:type=>"string", :default=>nil}, "full_name"=>{:type=>"string", :default=>nil}, "admin"=>{:type=>"boolean", :default=>true}}
+      db_columns = db.columns(table_name)
+
       columns.each do |col_name, data|
-        col_type = data[:type]
-        if !assume_missing && db.column_exists?(table_name, col_name.to_sym)
-          unless db.column_exists?(table_name, col_name.to_sym, col_type.to_sym)
-            display_change "Changing column type for '#{col_name}' to #{col_type}"
-            db.change_column(table_name, col_name.to_sym, col_type.to_sym)
-            if col_name.to_s =~ /_id$/
-              display_change "  (adding foreign_key index for '#{col_name}')"
-              db.add_index table_name, col_name.to_sym
-            end
-          end
-        else
+        col_type = data[:type].to_sym
+        col_default = data[:default]
+        db_col = !assume_missing && (db_columns.detect { |dbc| dbc.name == col_name })
+
+        if !db_col
           if !assume_missing
             display_change "Adding new column '#{col_name}' as #{col_type} for model #{model_name}"
           end
-          options = {}
-          options[:default] = false if col_type.to_sym == :boolean
-          db.add_column(table_name, col_name.to_sym, col_type.to_sym, options)
-          if col_name.to_s =~ /_id$/
-            display_change "  (adding foreign_key index for '#{col_name}')"
+          db.add_column(table_name, col_name.to_sym, col_type.to_sym, default: col_default)
+          if data[:index]
+            display_change "  (adding database index for '#{col_name}')"
             db.add_index table_name, col_name.to_sym
+          end
+        else
+          if db_col.type != col_type
+            display_change "Changing column type for #{col_name} to #{col_type} for model #{model_name}"
+          end
+
+          if db_col.default != col_default
+            display_change "Applying new default value #{col_default} for #{col_name} for model #{model_name}"
+          end
+
+          if (db_col.type != col_type) || (db_col.default != col_default)
+            db.change_column(table_name, col_name.to_sym, col_type.to_sym, default: col_default)
           end
         end
       end

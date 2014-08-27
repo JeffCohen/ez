@@ -1,10 +1,15 @@
 require_relative 'schema_modifier'
 
 module EZ
+  # The DomainModeler class implements the db/models.yml file syntax
+  # and provides a hash of the domain model specification.
+
   class DomainModeler
 
+    # Valid formats for default values
     DEFAULT_VALUE_REGEXES = [/\s*\((.+)?\)/, /\s+(.+)?\s*/, /,\s*default:\s*(.+)?\s*/]
 
+    # Get the domain model as a hash
     attr_reader :spec
 
     def initialize
@@ -113,6 +118,7 @@ module EZ
       default_column_value = default_column_value.to_f if column_type == 'float'
 
       @spec[model][column_name] = { type: column_type, default: default_column_value}
+      @spec[model][column_name][:index] = true if column_name =~ /_id$/
     end
   end
 
