@@ -17,6 +17,13 @@ module EZ
       Rake::Task["db:migrate"].enhance ["ez:tables"]
     end
 
+    config.to_prepare do
+      Rails.cache.fetch('ez-generate-yml-flag') do
+        EZ::DomainModeler.generate_models_yml
+      end
+      EZ::DomainModeler.update_tables
+    end
+
     console do |app|
       Hirb.enable(pager: false) if Rails.env.development? && defined?(Hirb)
 
@@ -27,9 +34,9 @@ module EZ
       tables = ActiveRecord::Base.connection.tables - ['schema_migrations']
       models = tables.map { |t| t.classify }
       if models.any?
-        puts "Use this console to add, update, and delete rows from the database."
-        puts
         puts "Models: #{models.to_sentence}"
+        puts
+        puts "Use this console to add, update, and delete rows from the database."
         puts
         puts "HINTS:"
         puts "* Type 'exit' (or press Ctrl-D) to when you're done."

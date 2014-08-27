@@ -139,20 +139,14 @@ module EZ
 
       dead_tables.each do |table_name|
         model_name = table_name.classify
-        display_change "Yo"
-        display_change "Dropping model #{model_name}"
+        display_change "Dropping table #{table_name}"
         db.drop_table(table_name)
         begin
           filename = "app/models/#{model_name.underscore}.rb"
           code = IO.read(filename)
-          matched = IO.read(filename) =~ /\s*class #{model_name} < ActiveRecord::Base\s+end\s*/
+          is_empty = IO.read(filename) =~ /\s*class #{model_name} < ActiveRecord::Base\s+end\s*/
 
-          display_change "-" * 20
-          display_change matched
-          display_change code
-          display_change "-" * 20
-
-          if matched
+          if is_empty
             display_change "Deleting file #{filename}"
             File.unlink(filename)
           end
