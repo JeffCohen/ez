@@ -3,7 +3,8 @@ module EZ
 
     attr_reader :db, :spec
 
-    def initialize(model_spec)
+    def initialize(model_spec, silent = false)
+      @silent = silent
       @spec = model_spec
       connect_to_database
     end
@@ -61,9 +62,9 @@ module EZ
 
     def add_missing_columns(model_name, columns, assume_missing = false)
       table_name = model_name.tableize
-      columns.each do |column|
-        col_name = column.keys.first
-        col_type = column[col_name]
+      # {"nickname"=>{:type=>"string", :default=>nil}, "password_digest"=>{:type=>"string", :default=>nil}, "created_at"=>{:type=>"datetime", :default=>nil}, "updated_at"=>{:type=>"datetime", :default=>nil}, "course_id"=>{:type=>"integer", :default=>"(0)"}, "email"=>{:type=>"string", :default=>nil}, "full_name"=>{:type=>"string", :default=>nil}, "admin"=>{:type=>"boolean", :default=>true}}
+      columns.each do |col_name, data|
+        col_type = data[:type]
         if !assume_missing && db.column_exists?(table_name, col_name.to_sym)
           unless db.column_exists?(table_name, col_name.to_sym, col_type.to_sym)
             display_change "Changing column type for '#{col_name}' to #{col_type}"
@@ -93,16 +94,6 @@ module EZ
       display_change "Defining new table for model '#{model_name}'."
       db.create_table table_name
       add_missing_columns model_name, columns, true
-      #     columns.each do |column|
-      #       name = column.keys.first
-      #       col_type = column[name]
-      #       options = {}
-      #       options[:default] = false if col_type.to_sym == :boolean
-      #       t.send(col_type, name, options)
-      #     end
-      #     # t.timestamps
-      #   end
-      # end
       filename = "app/models/#{model_name.underscore}.rb"
       unless Rails.env.production? || File.exists?(filename)
         display_change "Creating new model file: #{filename}"
@@ -121,12 +112,12 @@ module EZ
     def remove_dead_columns
       tables.each do |table_name|
         model_name = table_name.classify.to_s
+
         if @spec.has_key?(model_name)
-          columns = db.columns(table_name).map { |column| column.name.to_sym } - [:id, :created_at, :updated_at]
-          spec_columns = @spec[model_name].map do |column_entry|
-            column_entry.is_a?(Hash) ? column_entry.keys.first.to_sym : column_entry.to_sym
-          end
-          dead_columns = columns - spec_columns
+          db_columns = db.columns(table_name).map { |column| column.name.to_sym } - [:id, :created_at, :updated_at]
+          spec_columns = @spec[model_name].keys.map(&:to_sym)
+          dead_columns = db_columns - spec_columns
+
           if dead_columns.any?
             dead_columns.each do |dead_column_name|
               display_change "Removing unused column '#{dead_column_name}' from model '#{model_name}'"

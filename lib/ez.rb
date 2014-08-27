@@ -1,7 +1,7 @@
 require "ez/version"
 # require 'ez/dispatcher.rb'
 # require 'ez/mapper.rb'
-# require 'ez/controller.rb'
+require 'ez/controller.rb'
 
 require 'ez/apis.rb'
 require 'ez/domain_modeler.rb'
@@ -14,6 +14,7 @@ module EZ
   class Railtie < Rails::Railtie
     rake_tasks do
       load "tasks/ez_tasks.rake"
+      Rake::Task["db:migrate"].enhance ["ez:tables"]
     end
 
     console do |app|

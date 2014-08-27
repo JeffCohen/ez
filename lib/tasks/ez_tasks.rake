@@ -8,16 +8,21 @@ namespace :ez do
         f.puts <<-EOS
 # Example table for a typical Book model.
 #
-# Book:
-#   - title: string
-#   - price: integer
-#   - author: string
-#   - summary: text
-#   - hardcover: boolean
+Book
+  title: string
+  price: integer
+  author: string
+  summary: text
+  hardcover: boolean
 #
-# Follow the syntax exactly (colons and spacing are important).
-# Column type choices are: string, text, integer, and boolean.
-# You can have as many models as you want in this file.
+# Indent consistently!  Follow the above syntax exactly.
+# Typical column choices are: string, text, integer, boolean, date, and datetime.
+#
+# Default column values can be specified like this:
+#    price: integer(0)
+#
+# Have fun!
+
 EOS
       end
     end
@@ -29,7 +34,8 @@ EOS
 
 
   desc "Attempts to update the database schema and model files with minimal data loss."
-  task :tables => [:environment, 'db:migrate'] do
+  task :tables => [:environment] do
+    puts "Running ez:tables..."
     if File.exists?('db/models.yml')
       if EZ::DomainModeler.update_tables
         Rake::Task["db:schema:dump"].invoke unless Rails.env.production?
