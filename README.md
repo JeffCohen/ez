@@ -2,9 +2,10 @@
 
 **Version 0.9.8**
 
-For educational purposes only, but I'm now using it on small production apps with no problems.  Would love to get more real-world feedback.
-
 Makes domain modeling in Rails more beginner-friendly by avoiding migrations.
+
+For educational purposes only.
+
 
 ## Usage
 
@@ -138,6 +139,7 @@ Author
 * Shows helpful instructions when console starts, including the list of model classes found in the application.
 * Uses Hirb for table-like display. (Requires Hirb ~> 0.7.1)
 * Patches Hirb to allow nice table output for `ActiveRecord::Relation` lists (i.e. result of `.all`, `.where`) and hash-like output for single ActiveRecord objects, such as the result of `.find_by(:title => 'Apollo 13')`.
+* `reload!` will automatically trigger the table updates from the console.
 
 
 ### 4. Controller and View Enhancements
