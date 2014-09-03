@@ -2,9 +2,11 @@
 
 **Version 0.9.8**
 
+*For educational purposes only.*
+
 Makes domain modeling in Rails more beginner-friendly by avoiding migrations.
 
-For educational purposes only.
+Also enhances the rails console.
 
 
 ## Usage
@@ -13,15 +15,35 @@ For educational purposes only.
 gem 'ez'
 ```
 
+Then:
+
+`rake db:migrate` to generate a skeleton `db/models.yml` that you should edit.
+
+
+## Summary of Best Practices
+
+1. Use `db/models.yml` to define your schema. Foreign-key indexes will be generated automatically.  (This should cover 100% of what most beginners will ever need to do.)
+
+2. Use Rails migrations for any additional indexes, database constraints, etc.
+
+3. Just use `rake db:migrate` as usual.  Nothing new to learn.
+
+
+
 ## Features
 
 
 ### 1. Domain Modeling Enhancements
 
-* Enables **instant domain modeling without migrations** by editing a simple file named `db/models.yml` and then running `rake db:migrate`.  If things ever get messed up, use `rake ez:reset_tables` to drop the entire db first.
-* You can run `rake ez:tables` once to generate a file named `db/models.yml`.  It will have some self-documenting comments inside of it.
-* In development mode, there's no need to ever run `rake db:migrate` - every action will trigger automatic table updates.
-* You can run `rake db:migrate` whenever you modify `db/models.yml` instead of waiting for a browser action.
+* Enables **instant domain modeling without migrations** by using a file named `db/models.yml`.
+* No new rake tasks to learn.  This gem enhances `db:migrate` to incorporate the `db/models.yml` file automatically.
+* You can run `rake db:migrate` to initially generate a file named `db/models.yml`.  It will have some self-documenting comments inside of it.
+* In development mode, there's no need to ever run `rake db:migrate`! Every brower request will trigger automatic table updates.
+* In the rails console, 'reload!' will also trigger table updates.
+* If you prefer, you can run `rake db:migrate` whenever you modify `db/models.yml`.
+* `rake db:migrate` will run any pending migrations *after* following instructions in the `db/models.yml` file.
+
+
 
 **Syntax Guide for `db/models.yml`**
 

@@ -9,6 +9,11 @@ module EZ
     # Valid formats for default values
     DEFAULT_VALUE_REGEXES = [/\s*\((.+)?\)/, /\s+(.+)?\s*/, /,\s*default:\s*(.+)?\s*/]
 
+    def self.models
+      tables = ActiveRecord::Base.connection.tables - ['schema_migrations']
+      tables.map { |t| t.classify }
+    end
+
     # Get the domain model as a hash
     attr_reader :spec
 
@@ -61,6 +66,9 @@ module EZ
 
     def load_model_specs_from_string(s)
 
+      # Ignore comments
+      s.gsub!(/#.*$/,'')
+
       # Append missing colons
       s.gsub!(/^((\s|\-)*\w[^\:]+?)$/, '\1:')
 
@@ -112,7 +120,7 @@ module EZ
         end
       end
 
-      default_column_value = (column_type == 'boolean' ? true : nil)
+      default_column_value = (column_type == 'boolean' ? false : nil)
       DEFAULT_VALUE_REGEXES.each { |r| default_column_value = $1 if column_type.sub!(r, '') }
       default_column_value = default_column_value.to_i if column_type == 'integer'
       default_column_value = default_column_value.to_f if column_type == 'float'

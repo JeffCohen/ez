@@ -138,8 +138,8 @@ module EZ
     end
 
     def update_schema_version
-      db.initialize_schema_migrations_table
-      db.assume_migrated_upto_version(Time.now.utc.strftime("%Y%m%d%H%M%S"))
+      # db.initialize_schema_migrations_table
+      # db.assume_migrated_upto_version(Time.now.utc.strftime("%Y%m%d%H%M%S"))
     end
 
     def remove_dead_tables

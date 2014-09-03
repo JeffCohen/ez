@@ -11,28 +11,47 @@ require 'ez/view_helpers.rb'
 require 'hirb' if Rails.env.development?
 
 module EZ
+  module Console
+    def reload!(print=true)
+      puts "Reloading code..." if print
+      ActionDispatch::Reloader.cleanup!
+      ActionDispatch::Reloader.prepare!
+
+      puts "Updating tables (if necessary) ..." if print
+      old_level = ActiveRecord::Base.logger.level
+      ActiveRecord::Base.logger.level = Logger::WARN
+      EZ::DomainModeler.generate_models_yml
+      EZ::DomainModeler.update_tables
+      puts "Models: #{EZ::DomainModeler.models.to_sentence}"
+      ActiveRecord::Base.logger.level = old_level
+      true
+    end
+  end
+end
+
+module EZ
+
   class Railtie < Rails::Railtie
     rake_tasks do
       load "tasks/ez_tasks.rake"
       Rake::Task["db:migrate"].enhance ["ez:tables"]
     end
 
-    config.to_prepare do
-      Rails.cache.fetch('ez-generate-yml-flag') do
-        EZ::DomainModeler.generate_models_yml
-      end
-      EZ::DomainModeler.update_tables
-    end
-
     console do |app|
-      Hirb.enable(pager: false) if Rails.env.development? && defined?(Hirb)
+      Rails::ConsoleMethods.send :prepend, EZ::Console
+      Hirb.enable(pager: false) if ::Rails.env.development? && defined?(Hirb)
+
+      old_level = ActiveRecord::Base.logger.level
+      ActiveRecord::Base.logger.level = Logger::WARN
+      EZ::DomainModeler.generate_models_yml
+      EZ::DomainModeler.update_tables(true)
+      ActiveRecord::Base.logger.level = old_level
 
       I18n.enforce_available_locales = false
       puts "Welcome to the Rails Console."
       puts "-" * 60
       puts
-      tables = ActiveRecord::Base.connection.tables - ['schema_migrations']
-      models = tables.map { |t| t.classify }
+      models = EZ::DomainModeler.models
       if models.any?
         puts "Models: #{models.to_sentence}"
         puts
