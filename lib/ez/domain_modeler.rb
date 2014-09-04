@@ -18,8 +18,10 @@ module EZ
     attr_reader :spec
 
     def initialize
+      @ok = false
       begin
         load_model_specs
+        @ok = true
       rescue => e
         puts e
       end
@@ -57,11 +59,16 @@ module EZ
     end
 
     def update_tables(silent = false)
+      return false unless @ok
+
       SchemaModifier.migrate(@spec, silent)
+      return true
 
       rescue => e
         puts e.message unless silent
         puts e.backtrace.first unless silent
+        @ok = false
+        return false
     end
 
     def load_model_specs_from_string(s)
@@ -94,9 +101,18 @@ module EZ
       @spec ||= {}
       @spec.each do |model, columns|
 
+        msg = nil
+
         if !columns.is_a?(Hash)
-          raise "Could not understand models.yml while parsing model: #{model}"
+          msg = "Could not understand models.yml while parsing model '#{model}'."
         end
+
+        if model !~ /^[A-Z]/ || model =~ /\s/
+          msg = "Could not understand models.yml while parsing model '#{model}'."
+          msg <<  " Models must begin with an uppercase letter and cannot contain spaces."
+        end
+
+        raise msg if msg
 
         columns.each do |column_name, column_type|
           interpret_column_spec column_name, column_type, model
