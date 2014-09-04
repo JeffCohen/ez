@@ -22,11 +22,11 @@ Then:
 
 ## Summary of Best Practices
 
-1. Use `db/models.yml` to define your schema. Foreign-key indexes will be generated automatically.  (This should cover 100% of what most beginners will ever need to do.)
+1. Use `db/models.yml` to define your schema. Foreign-key indexes will be generated automatically.  (This step by itself should cover 100% of what most beginners will ever need to do.)
 
 2. Use Rails migrations for any additional indexes, database constraints, etc.
 
-3. Just use `rake db:migrate` as usual.  Nothing new to learn.
+3. Overall, just use `rake db:migrate` as usual.
 
 
 
@@ -38,11 +38,10 @@ Then:
 * Enables **instant domain modeling without migrations** by using a file named `db/models.yml`.
 * No new rake tasks to learn.  This gem enhances `db:migrate` to incorporate the `db/models.yml` file automatically.
 * You can run `rake db:migrate` to initially generate a file named `db/models.yml`.  It will have some self-documenting comments inside of it.
-* In development mode, there's no need to ever run `rake db:migrate`! Every brower request will trigger automatic table updates.
+* In development mode, there's no need to ever run `rake db:migrate`! Every browser request will trigger automatic table updates.
 * In the rails console, 'reload!' will also trigger table updates.
-* If you prefer, you can run `rake db:migrate` whenever you modify `db/models.yml`.
-* `rake db:migrate` will run any pending migrations *after* following instructions in the `db/models.yml` file.
-
+* If you prefer, just run `rake db:migrate` whenever you modify `db/models.yml`.
+* `rake db:migrate` will run any pending migrations *after* any table updates from the `db/models.yml` file.
 
 
 **Syntax Guide for `db/models.yml`**
