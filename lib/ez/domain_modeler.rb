@@ -136,10 +136,14 @@ module EZ
         end
       end
 
-      default_column_value = (column_type == 'boolean' ? false : nil)
+      default_column_value = nil
       DEFAULT_VALUE_REGEXES.each { |r| default_column_value = $1 if column_type.sub!(r, '') }
       default_column_value = default_column_value.to_i if column_type == 'integer'
       default_column_value = default_column_value.to_f if column_type == 'float'
+
+      if column_type == 'boolean'
+        default_column_value = default_column_value.present? && default_column_value.downcase.strip == 'true'
+      end
 
       @spec[model][column_name] = { type: column_type, default: default_column_value}
       @spec[model][column_name][:index] = true if column_name =~ /_id$/
