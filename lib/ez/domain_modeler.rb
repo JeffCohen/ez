@@ -54,14 +54,14 @@ module EZ
       end
     end
 
-    def self.update_tables(silent = false)
-      self.new.update_tables(silent)
+    def self.update_tables(silent = false, dry_run = false)
+      self.new.update_tables(silent, dry_run)
     end
 
-    def update_tables(silent = false)
+    def update_tables(silent = false, dry_run = false)
       return false unless @ok
 
-      SchemaModifier.migrate(@spec, silent)
+      SchemaModifier.migrate(@spec, silent, dry_run)
       return true
 
       rescue => e
@@ -138,8 +138,8 @@ module EZ
 
       default_column_value = nil
       DEFAULT_VALUE_REGEXES.each { |r| default_column_value = $1 if column_type.sub!(r, '') }
-      default_column_value = default_column_value.to_i if column_type == 'integer'
-      default_column_value = default_column_value.to_f if column_type == 'float'
+      default_column_value = default_column_value.to_i if default_column_value.present? && column_type == 'integer'
+      default_column_value = default_column_value.to_f if default_column_value.present? && column_type == 'float'
 
       if column_type == 'boolean'
         default_column_value = default_column_value.present? && default_column_value.downcase.strip == 'true'

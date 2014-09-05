@@ -1,3 +1,19 @@
+namespace :db do
+
+  namespace :migrate do
+
+    desc "Preview table updates"
+    task :preview => :environment do
+      if File.exists?('db/models.yml')
+        EZ::DomainModeler.update_tables(false, true)
+      else
+        puts "Nothing to preview."
+      end
+    end
+
+  end
+end
+
 namespace :ez do
 
   desc "Generate models.yml if it doesn't exist yet."
