@@ -99,7 +99,9 @@ module EZ
 
           # puts "#{table_name} #{col_name}: #{db_col.default} and #{col_default}"
           if db_col.default != col_default
-            display_change "Applying new default value #{col_default || 'NULL'} for #{col_name} for model #{model_name}"
+            displayable_value = col_default
+            displayable_value = "NULL" if col_default.nil?
+            display_change "Applying new default value #{displayable_value} for #{col_name} for model #{model_name}"
           end
 
           if (db_col.type != col_type) || (db_col.default != col_default)

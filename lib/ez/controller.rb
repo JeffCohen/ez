@@ -9,7 +9,7 @@ module ActionController
         Rails.cache.fetch('ez-generate-yml') do
           EZ::DomainModeler.generate_models_yml
         end
-        EZ::DomainModeler.update_tables
+        EZ::DomainModeler.update_tables(true)
       end
 
     end
