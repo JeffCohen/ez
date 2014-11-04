@@ -1,6 +1,6 @@
 # EZ
 
-**Version 1.1.0**
+**Version 1.1.2**
 
 *For educational purposes only.*
 
