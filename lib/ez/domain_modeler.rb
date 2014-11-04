@@ -34,12 +34,12 @@ module EZ
           f.puts <<-EOS
   # Example table for a typical Book model.
   #
-  Book
-    title: string
-    price: integer
-    author: string
-    summary: text
-    hardcover: boolean
+  # Book
+  #   title: string
+  #   price: integer
+  #   author: string
+  #   summary: text
+  #   hardcover: boolean
   #
   # Indent consistently!  Follow the above syntax exactly.
   # Typical column choices are: string, text, integer, boolean, date, and datetime.
