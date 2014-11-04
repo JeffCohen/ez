@@ -27,6 +27,10 @@ module EZ
       end
     end
 
+    def self.dump_schema
+      `bundle exec rake db:schema:dump`
+    end
+
     def self.generate_models_yml
       filename = Rails.root + "db/models.yml"
       unless File.exist?(filename)

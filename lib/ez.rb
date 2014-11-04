@@ -22,6 +22,7 @@ module EZ
       ActiveRecord::Base.logger.level = Logger::WARN
       EZ::DomainModeler.generate_models_yml
       EZ::DomainModeler.update_tables
+      EZ::DomainModeler.dump_schema
       puts "Models: #{EZ::DomainModeler.models.to_sentence}"
       ActiveRecord::Base.logger.level = old_level
       true

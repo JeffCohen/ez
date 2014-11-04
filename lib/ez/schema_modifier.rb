@@ -29,7 +29,6 @@ module EZ
       remove_dead_schema
 
       if @changed
-        update_schema_version unless @dry_run
         puts "\n(No changes were actually made)" if @dry_run
       else
           puts "All tables are up-to-date."
