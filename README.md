@@ -17,7 +17,11 @@ gem 'ez'
 
 Then:
 
-`rake db:migrate` to generate a skeleton `db/models.yml` that you should edit.
+```
+rake db:migrate
+```
+
+to generate a skeleton `db/models.yml` that you should edit.
 
 
 ## Summary of Best Practices

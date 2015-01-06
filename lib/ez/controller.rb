@@ -3,7 +3,7 @@ module ActionController
 
     if Rails.env.development?
 
-      before_action :ez_update_tables
+      # before_action :ez_update_tables
 
       def ez_update_tables
         Rails.cache.fetch('ez-generate-yml') do
