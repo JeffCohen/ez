@@ -39,12 +39,10 @@ to generate a skeleton `db/models.yml` that you should edit.
 
 ### 1. Domain Modeling Enhancements
 
-* Enables **instant domain modeling without migrations** by using a file named `db/models.yml`.
 * This gem enhances `db:migrate` to incorporate the `db/models.yml` file automatically.
 * Run `rake db:migrate` to initially generate a file named `db/models.yml`.  It will have some self-documenting comments inside of it.
-* In development mode, there's no need to ever run `rake db:migrate`! Every browser request will trigger automatic table updates.
-* In the rails console, 'reload!' will also trigger table updates.
-* If you prefer, just run `rake db:migrate` whenever you modify `db/models.yml`.
+* Just run `rake db:migrate` whenever you modify `db/models.yml`.
+* Starting the rails console will automatically run any pending table updates, and `reload!` will also trigger table updates while inside the console.
 * `rake db:migrate` will run any pending migrations *after* any table updates from the `db/models.yml` file.
 
 
@@ -154,8 +152,9 @@ Author
 ### 2. More Model Enhancements
 
 * Adds ActiveRecord::Base `.read` method so that models have complete *CRUD*: `.create`, `.read`, `.update`, and `.delete`.  When given an integer, `.read` becomes a synonym for `.find`.  When given a hash, it is a synonym for `.where`.
-* Adds ActiveRecord::Base `.sample` method to choose a random row.
-* Adds ActiveRecord::Base `[id]` method as a synonym for `.find_by(id: ...)`. Especially handy in the console, i.e. `Book[5]` instead of `Book.find_by(id: 5)` and in controllers: `Book[params[:id]]` if you don't find the double bracing too harsh to look at.
+* Adds `.sample` method to choose a random row.
+* Adds `.to_ez' to generate a snippet from legacy models that you can paste into models.yml.
+
 
 
 ### 3. Beginner-friendly "It Just Works" console
