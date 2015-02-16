@@ -1,12 +1,12 @@
 # EZ
 
-**Version 1.1.3**
+**Version 1.3.0**
 
 *For educational purposes only.*
 
-Makes domain modeling in Rails more beginner-friendly by avoiding migrations.
+Easy domain modeling in Rails without migrations.  Applies instant schema changes based on a file named `db/models.yml`.  Diffs are determined automatically and applied to the database.  Embraces Rails column naming conventions by providing happy-path default types for most columns.
 
-Also enhances the rails console.
+Also, enhances the rails console and provides extra ActiveRecord helper methods.
 
 
 ## Usage
@@ -24,15 +24,15 @@ rake db:migrate
 to generate a skeleton `db/models.yml` that you should edit.
 
 
-## Summary of Best Practices
+## Get Started
 
 1. Run `rake db:migrate` to initially generate a file named `db/models.yml`.
 
 2. Use `db/models.yml` to define your schema. Database schema changes are applied directly and triggered automatically in development mode.  (`rake db:migrate` will also trigger the changes).  Foreign-key indexes will be generated automatically.
 
-3. You can continue to use traditional Rails migrations for any additional indexes, database constraints, etc.
+3. You can still use traditional Rails migrations for any additional indexes, database constraints, etc.
 
-4. Run `rake db:migrate:preview` to do a "dry run" to see what would change based your `db/models.yml` file.
+4. Run `rake db:migrate:preview` to do a "dry run" and see what would change based your `db/models.yml` file.
 
 ## Features
 
@@ -48,7 +48,7 @@ to generate a skeleton `db/models.yml` that you should edit.
 
 **Syntax Guide for `db/models.yml`**
 
-It's just YAML and the syntax is very simple:
+It's just YML and the syntax is very simple:
 
 ```
 Book:
@@ -95,7 +95,8 @@ Author
   book_count
 ```
 
-Finally, you can specify default values for columns in several ways.  Suppose we want to make sure that `copies_on_hand` always has the value `0` for new rows.  First, the fancy way:
+**Default Values**
+You can specify default values for columns in several ways.  Suppose we want to make sure that `copies_on_hand` always has the value `0` for new rows.  First, the fancy way:
 
 ```
 Book
@@ -129,7 +130,7 @@ Author
   book_count: integer default 0
 ```
 
-And for the extra lazy like me, you can use parentheses:
+And for the extra lazy, like me, you can just use parentheses:
 
 ```
 Book
@@ -159,11 +160,12 @@ Author
 
 ### 3. Beginner-friendly "It Just Works" console
 
+* Starting `rails console` will automatically apply any pending database changes, followed by any traditional migrations.
 * Solves the "no connection" message in Rails >= 4.0.1 (if you try to inspect a model without making a query first) by establishing an initial connection to the development database.
 * Shows helpful instructions when console starts, including the list of model classes found in the application.
 * Uses Hirb for table-like display. (Requires Hirb ~> 0.7.1)
 * Patches Hirb to allow nice table output for `ActiveRecord::Relation` lists (i.e. result of `.all`, `.where`) and hash-like output for single ActiveRecord objects, such as the result of `.find_by(:title => 'Apollo 13')`.
-* `reload!` will automatically trigger the table updates from the console.
+* `reload!` will also force a schema update from the console.
 
 
 ### 4. Controller and View Enhancements

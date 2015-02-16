@@ -150,6 +150,7 @@ module EZ
       end
 
       @spec[model][column_name] = { type: column_type, default: default_column_value}
+      @spec[model][column_name][:limit] = 1024 if column_type == 'binary'
       @spec[model][column_name][:index] = true if column_name =~ /_id$/
     end
   end

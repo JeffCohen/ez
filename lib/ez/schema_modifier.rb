@@ -86,7 +86,9 @@ module EZ
           if !assume_missing
             display_change "Adding new column '#{col_name}' as #{col_type} for model #{model_name}"
           end
-          db.add_column(table_name, col_name.to_sym, col_type.to_sym, default: col_default)  unless @dry_run
+          opts = { default: col_default }
+          opts[:limit] = data[:limit] if data[:limit]
+          db.add_column(table_name, col_name.to_sym, col_type.to_sym, opts)  unless @dry_run
           if data[:index]
             display_change "  (adding database index for '#{col_name}')"
             db.add_index table_name, col_name.to_sym unless @dry_run
@@ -104,7 +106,9 @@ module EZ
           end
 
           if (db_col.type != col_type) || (db_col.default != col_default)
-            db.change_column(table_name, col_name.to_sym, col_type.to_sym, default: col_default)  unless @dry_run
+              opts = { default: col_default }
+              opts[:limit] = data[:limit] if data[:limit]
+              db.change_column(table_name, col_name.to_sym, col_type.to_sym, opts)  unless @dry_run
           end
         end
       end
