@@ -17,8 +17,13 @@ Also, enhances the rails console and provides extra ActiveRecord helper methods.
 gem 'ez'
 ```
 
-Then:
+Then (Rails 5.x):
 
+```
+rails db:migrate
+```
+
+or (Rails 4.x)
 ```
 rake db:migrate
 ```
