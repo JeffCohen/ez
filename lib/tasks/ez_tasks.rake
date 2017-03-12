@@ -35,7 +35,7 @@ namespace :ez do
 # Typical column choices are: string, text, integer, boolean, date, time, and datetime.
 #
 #
-# Specifying Default Values
+# About Default Values
 # ----------------------------------------------------
 # Default column values can be specified like this:
 #    price: integer(0)
@@ -73,7 +73,7 @@ EOS
   task :tables => [:environment] do
     if File.exists?('db/models.yml')
       if EZ::DomainModeler.update_tables
-        Rake::Task["db:schema:dump"].invoke unless Rails.env.production?
+        Rake::Task["db:schema:dump"].invoke if (Rails.env.development? || Rails.env.test?)
       end
     else
       Rake::Task["ez:generate_yml"].invoke

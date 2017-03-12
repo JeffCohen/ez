@@ -2,13 +2,18 @@ require "ez/version"
 require 'ez/domain_modeler.rb'
 require 'ez/model.rb'
 
-require 'hirb' if Rails.env.development?
+require 'hirb' if (Rails.env.development? || Rails.env.test?)
 
 module EZ
   module Console
     def reload!(print = true)
       puts "Reloading code..." if print
-      Rails.application.reloader.reload!
+      if Rails::VERSION::MAJOR < 5
+        ActionDispatch::Reloader.cleanup!
+        ActionDispatch::Reloader.prepare!
+      else
+        Rails.application.reloader.reload!
+      end
 
       puts "Updating tables (if necessary) ..." if print
       old_level = ActiveRecord::Base.logger.level
@@ -33,7 +38,7 @@ module EZ
 
     console do |app|
       Rails::ConsoleMethods.send :prepend, EZ::Console
-      Hirb.enable(pager: false) if ::Rails.env.development? && defined?(Hirb)
+      Hirb.enable(pager: false) if ::(Rails.env.development? || Rails.env.test?) && defined?(Hirb)
 
       old_level = ActiveRecord::Base.logger.level
       ActiveRecord::Base.logger.level = Logger::WARN
@@ -71,7 +76,7 @@ module EZ
       #   end
       # end
 
-      if Rails.env.development?
+      if (Rails.env.development? || Rails.env.test?)
         module ::Hirb
           # A Formatter object formats an output object (using Formatter.format_output) into a string based on the views defined
           # for its class and/or ancestry.

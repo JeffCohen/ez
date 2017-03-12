@@ -1,8 +1,10 @@
 # EZ
 
-**Version 1.3.0**
+**Version 1.5.0.2**
 
 *For educational purposes only.*
+
+Tested against Rails 5.0.2 and Rails 4.2.6.
 
 Easy domain modeling in Rails without migrations.  Applies instant schema changes based on a file named `db/models.yml`.  Diffs are determined automatically and applied to the database.  Embraces Rails column naming conventions by providing happy-path default types for most columns.
 
@@ -40,10 +42,10 @@ to generate a skeleton `db/models.yml` that you should edit.
 ### 1. Domain Modeling Enhancements
 
 * This gem enhances `db:migrate` to incorporate the `db/models.yml` file automatically.
-* Run `rake db:migrate` to initially generate a file named `db/models.yml`.  It will have some self-documenting comments inside of it.
-* Just run `rake db:migrate` whenever you modify `db/models.yml`.
-* Starting the rails console will automatically run any pending table updates, and `reload!` will also trigger table updates while inside the console.
-* `rake db:migrate` will run any pending migrations *after* any table updates from the `db/models.yml` file.
+* Run `rails db:migrate` (Rails 5.x) or `rake db:migrate` (Rails 4.x) to initially generate a file named `db/models.yml`.  It will have some self-documenting comments inside of it.
+* Just run `rails db:migrate` (or `rake db:migrate`) whenever you modify `db/models.yml`.
+* Using `reload!` inside the rails console is an alternative to the `db:migrate` task.
+* Pending migrations will be run *after* running table updates based on the `db/models.yml` file.
 
 
 **Syntax Guide for `db/models.yml`**
@@ -160,16 +162,8 @@ Author
 
 ### 3. Beginner-friendly "It Just Works" console
 
-* Starting `rails console` will automatically apply any pending database changes, followed by any traditional migrations.
 * Solves the "no connection" message in Rails >= 4.0.1 (if you try to inspect a model without making a query first) by establishing an initial connection to the development database.
 * Shows helpful instructions when console starts, including the list of model classes found in the application.
 * Uses Hirb for table-like display. (Requires Hirb ~> 0.7.1)
 * Patches Hirb to allow nice table output for `ActiveRecord::Relation` lists (i.e. result of `.all`, `.where`) and hash-like output for single ActiveRecord objects, such as the result of `.find_by(:title => 'Apollo 13')`.
-* `reload!` will also force a schema update from the console.
-
-
-### 4. Controller and View Enhancements
-
-* Easier JSON API calls by calling `EZ.from_api(url)`; returns parsed Ruby hash (or array, etc.)
-* Built-in view helper `<%= weather %>` and `EZ.weather` for classroom demo of a JSON API, to get quick hash and avoid gory details.  (Relies on http://openweathermap.org).  Default location is Evanston.  Can pass location: `<%= weather('San Diego, CA') %>`.  The `<%= weather %>` helper just delegates to `EZ.weather`.
-* Adds view helper `map` to display a static Google map of any address. Example: `<%= map('Millenium Park, Chicago, IL') %>`
+* `reload!` will force a schema update from the console.

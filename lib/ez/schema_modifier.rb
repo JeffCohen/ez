@@ -124,7 +124,7 @@ module EZ
       db.create_table table_name  unless @dry_run
       add_missing_columns model_name, spec_columns, true
       filename = "app/models/#{model_name.underscore}.rb"
-      unless Rails.env.production? || File.exists?(filename)
+      if (Rails.env.development? || Rails.env.test?) && !File.exists?(filename)
         display_change "Creating new model file: #{filename}"
         File.open(filename, "w") do |f|
           f.puts "class #{model_name} < ActiveRecord::Base"
@@ -134,11 +134,15 @@ module EZ
     end
 
     def remove_dead_schema
+      return unless Rails.env.development? || Rails.env.test?
+
       remove_dead_tables
       remove_dead_columns
     end
 
     def remove_dead_columns
+      return unless Rails.env.development? || Rails.env.test?
+
       tables.each do |table_name|
         model_name = table_name.classify.to_s
 
@@ -165,6 +169,8 @@ module EZ
     end
 
     def remove_dead_tables
+      return unless Rails.env.development? || Rails.env.test?
+
       tables_we_need = @spec.keys.map { |model| model.tableize }
       dead_tables = tables - tables_we_need
 

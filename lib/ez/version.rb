@@ -1,3 +1,3 @@
 module EZ
-  VERSION = "1.4.0.3"
+  VERSION = "1.5.0.2"
 end
