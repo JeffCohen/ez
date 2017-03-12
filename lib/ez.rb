@@ -1,21 +1,14 @@
 require "ez/version"
-# require 'ez/dispatcher.rb'
-# require 'ez/mapper.rb'
-require 'ez/controller.rb'
-
-require 'ez/apis.rb'
 require 'ez/domain_modeler.rb'
 require 'ez/model.rb'
-require 'ez/view_helpers.rb'
 
 require 'hirb' if Rails.env.development?
 
 module EZ
   module Console
-    def reload!(print=true)
+    def reload!(print = true)
       puts "Reloading code..." if print
-      ActionDispatch::Reloader.cleanup!
-      ActionDispatch::Reloader.prepare!
+      Rails.application.reloader.reload!
 
       puts "Updating tables (if necessary) ..." if print
       old_level = ActiveRecord::Base.logger.level
@@ -70,11 +63,7 @@ module EZ
 
     initializer "ez" do
 
-      ActiveSupport.on_load :action_view do
-        include EZ::ViewHelpers
-      end
-
-      # tables = ActiveRecord::Base.connection.tables - ['schema_migrations']
+      # tables = ActiveRecord::Base.connection.data_sources - ['schema_migrations', 'ar_internal_metadata']
       # models.each { |m| m.constantize.magic_associations }
       # Rails.application.routes.draw do
       #   tables.each do |table_name|

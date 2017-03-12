@@ -1,6 +1,9 @@
 require_relative 'schema_modifier'
 
 module EZ
+
+  COLUMN_TRUE_VALUES = [true, 1, '1', 't', 'T', 'true', 'TRUE']
+
   # The DomainModeler class implements the db/models.yml file syntax
   # and provides a hash of the domain model specification.
 
@@ -10,7 +13,7 @@ module EZ
     DEFAULT_VALUE_REGEXES = [/\s*\((.+)?\)/, /\s+(.+)?\s*/, /,\s*default:\s*(.+)?\s*/]
 
     def self.models
-      tables = ActiveRecord::Base.connection.tables - ['schema_migrations']
+      tables = ActiveRecord::Base.connection.data_sources - ['schema_migrations', 'ar_internal_metadata']
       tables.map { |t| t.classify }
     end
 
@@ -50,6 +53,7 @@ module EZ
   #
   # Default column values can be specified like this:
   #    price: integer(0)
+  #    hardcover: boolean(false)
   #
   # Have fun!
 
@@ -146,7 +150,7 @@ module EZ
       default_column_value = default_column_value.to_f if default_column_value.present? && column_type == 'float'
 
       if column_type == 'boolean'
-        default_column_value = default_column_value.present? && default_column_value.downcase.strip == 'true'
+        default_column_value = default_column_value.present? && default_column_value.in?(EZ::COLUMN_TRUE_VALUES)
       end
 
       @spec[model][column_name] = { type: column_type, default: default_column_value}

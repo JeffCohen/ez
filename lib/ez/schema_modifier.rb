@@ -47,7 +47,7 @@ module EZ
 
 
     def tables
-      @tables ||= (db.tables - ['schema_migrations'])
+      @tables ||= (db.data_sources - ['schema_migrations', 'ar_internal_metadata'])
     end
 
     def missing_model?(model_name)
@@ -73,52 +73,56 @@ module EZ
       @changed = true
     end
 
-    def add_missing_columns(model_name, columns, assume_missing = false)
+    def add_missing_columns(model_name, spec_columns, assume_missing = false)
       table_name = model_name.tableize
       db_columns = db.columns(table_name)
 
-      columns.each do |col_name, data|
-        col_type = data[:type].to_sym
-        col_default = data[:default]
+      spec_columns.each do |col_name, col_spec|
+        col_type = col_spec[:type].to_sym
+        col_default = col_spec[:default]
         db_col = !assume_missing && (db_columns.detect { |dbc| dbc.name == col_name })
 
         if !db_col
           if !assume_missing
-            display_change "Adding new column '#{col_name}' as #{col_type} for model #{model_name}"
+            display_change "Adding new column '#{col_name}' as #{col_type} in model #{model_name}"
           end
           opts = { default: col_default }
-          opts[:limit] = data[:limit] if data[:limit]
+          opts[:limit] = col_spec[:limit] if col_spec[:limit]
           db.add_column(table_name, col_name.to_sym, col_type.to_sym, opts)  unless @dry_run
-          if data[:index]
+          if col_spec[:index]
             display_change "  (adding database index for '#{col_name}')"
             db.add_index table_name, col_name.to_sym unless @dry_run
           end
         else
           if db_col.type != col_type
-            display_change "Changing column type for #{col_name} to #{col_type} for model #{model_name}"
+            display_change "Changing column type for #{col_name} to #{col_type} in model #{model_name}"
           end
 
           # puts "#{table_name} #{col_name}: #{db_col.default} and #{col_default}"
-          if db_col.default != col_default
+          if col_type == :boolean
+            db_col_default = db_col.default.in?(EZ::COLUMN_TRUE_VALUES)
+          end
+
+          if db_col_default != col_default
             displayable_value = col_default
             displayable_value = "NULL" if col_default.nil?
-            display_change "Applying new default value #{displayable_value} for #{col_name} for model #{model_name}"
+            display_change "Applying new default value `#{displayable_value}` for #{col_name} attrbute in model #{model_name}"
           end
 
           if (db_col.type != col_type) || (db_col.default != col_default)
               opts = { default: col_default }
-              opts[:limit] = data[:limit] if data[:limit]
+              opts[:limit] = col_spec[:limit] if col_spec[:limit]
               db.change_column(table_name, col_name.to_sym, col_type.to_sym, opts)  unless @dry_run
           end
         end
       end
     end
 
-    def add_model(model_name, columns)
+    def add_model(model_name, spec_columns)
       table_name = model_name.tableize
       display_change "Defining new table for model '#{model_name}'."
       db.create_table table_name  unless @dry_run
-      add_missing_columns model_name, columns, true
+      add_missing_columns model_name, spec_columns, true
       filename = "app/models/#{model_name.underscore}.rb"
       unless Rails.env.production? || File.exists?(filename)
         display_change "Creating new model file: #{filename}"

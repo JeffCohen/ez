@@ -27,7 +27,7 @@ module Starter
     end
 
     def app_tables
-      ActiveRecord::Base.connection.tables - ['schema_migrations']
+      ActiveRecord::Base.connection.data_sources - ['schema_migrations', 'ar_internal_metadata']
     end
 
   end
