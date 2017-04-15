@@ -127,7 +127,9 @@ module EZ
       if (Rails.env.development? || Rails.env.test?) && !File.exists?(filename)
         display_change "Creating new model file: #{filename}"
         File.open(filename, "w") do |f|
-          f.puts "class #{model_name} < ActiveRecord::Base"
+          base_class = "ApplicationRecord"
+          base_class = "ActiveRecord::Base" if Rails::VERSION::MAJOR < 5
+          f.puts "class #{model_name} < #{base_class}"
           f.puts "end"
         end
       end

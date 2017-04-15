@@ -1,3 +1,6 @@
+*Version 1.5.0.4*
+- Use `ApplicationRecord` as the model base class for Rails version >= 5
+
 *Version 1.5.0.3*
 - Fixed bug when configuring Hirb
 
