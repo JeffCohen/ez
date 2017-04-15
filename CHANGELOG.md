@@ -1,3 +1,6 @@
+*Version 1.5.0.3*
+- Fixed bug when configuring Hirb
+
 *Version 1.5.0.2*
 
 - Rails 5 compatibility

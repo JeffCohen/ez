@@ -38,7 +38,7 @@ module EZ
 
     console do |app|
       Rails::ConsoleMethods.send :prepend, EZ::Console
-      Hirb.enable(pager: false) if ::(Rails.env.development? || Rails.env.test?) && defined?(Hirb)
+      Hirb.enable(pager: false) if (Rails.env.development? || Rails.env.test?) && defined?(Hirb)
 
       old_level = ActiveRecord::Base.logger.level
       ActiveRecord::Base.logger.level = Logger::WARN
