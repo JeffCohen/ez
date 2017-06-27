@@ -1,14 +1,20 @@
 # EZ
 
-**Version 1.5.0.2**
+**Version 1.5.0.3**
 
 *For educational purposes only.*
 
-Tested against Rails 5.0.2 and Rails 4.2.6.
+Tested against Rails 5.1.1.
 
-Easy domain modeling in Rails without migrations.  Applies instant schema changes based on a file named `db/models.yml`.  Diffs are determined automatically and applied to the database.  Embraces Rails column naming conventions by providing happy-path default types for most columns.
+_NOTE: For Rails < 5.0, use version 1.3_.
 
-Also, enhances the rails console and provides extra ActiveRecord helper methods.
+Easy domain modeling in Rails without migrations.  
+
+* Applies instant schema changes based on a file named `db/models.yml`.  
+* Diffs are determined automatically and applied to the database.  
+* Embraces Rails' column naming conventions by inferring columns types based on the name.
+* Enhances the rails console
+* Provides extra ActiveRecord helper methods.
 
 
 ## Usage
@@ -33,7 +39,7 @@ to generate a skeleton `db/models.yml` that you should edit.
 
 ## Get Started
 
-1. Run `rake db:migrate` to initially generate a file named `db/models.yml`.
+1. Run `rails db:migrate` to initially generate a file named `db/models.yml`.
 
 2. Use `db/models.yml` to define your schema. Database schema changes are applied directly and triggered automatically in development mode.  (`rake db:migrate` will also trigger the changes).  Foreign-key indexes will be generated automatically.
 
@@ -161,7 +167,7 @@ Author
 
 * Adds ActiveRecord::Base `.read` method so that models have complete *CRUD*: `.create`, `.read`, `.update`, and `.delete`.  When given an integer, `.read` becomes a synonym for `.find`.  When given a hash, it is a synonym for `.where`.
 * Adds `.sample` method to choose a random row.
-* Adds `.to_ez' to generate a snippet from legacy models that you can paste into models.yml.
+* Adds `.to_ez` to generate a snippet from legacy models that you can paste into models.yml.
 
 
 
