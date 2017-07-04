@@ -183,7 +183,7 @@ module EZ
         begin
           filename = "app/models/#{model_name.underscore}.rb"
           code = IO.read(filename)
-          is_empty = IO.read(filename) =~ /\s*class #{model_name} < ActiveRecord::Base\s+end\s*/
+          is_empty = IO.read(filename) =~ /\s*class #{model_name} < ApplicationRecord\s+end\s*/
 
           if is_empty
             display_change "Deleting file #{filename}"
