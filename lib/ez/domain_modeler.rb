@@ -12,9 +12,35 @@ module EZ
     # Valid formats for default values
     DEFAULT_VALUE_REGEXES = [/\s*\((.+)?\)/, /\s+(.+)?\s*/, /,\s*default:\s*(.+)?\s*/]
 
-    def self.models
+    def self.tables
       tables = ActiveRecord::Base.connection.data_sources - ['schema_migrations', 'ar_internal_metadata']
+    end
+
+    def self.models
       tables.map { |t| t.classify }
+    end
+
+    def self.automigrate
+      if EZ::Config.models?
+        models_yml = File.join(Rails.root, 'db', 'models.yml')
+        schema_rb = File.join(Rails.root, 'db', 'schema.rb')
+
+        EZ::DomainModeler.generate_models_yml unless File.exist?(models_yml)
+
+        if !File.exist?(schema_rb) || (File.mtime(schema_rb) < File.mtime(models_yml))
+          puts "Updating your app based on models.yml..."
+          old_level = ActiveRecord::Base.logger.level
+          ActiveRecord::Base.logger.level = Logger::WARN
+
+          EZ::DomainModeler.update_tables
+          dump_schema if (Rails.env.development? || Rails.env.test?)
+          puts "Models: #{EZ::DomainModeler.models.to_sentence}"
+          ActiveRecord::Base.logger.level = old_level
+        end
+
+        EZ::RailsUpdater.update!
+
+      end
     end
 
     # Get the domain model as a hash
@@ -31,7 +57,10 @@ module EZ
     end
 
     def self.dump_schema
-      `bundle exec rake db:schema:dump`
+      require "active_record/schema_dumper"
+      File.open(File.join(Rails.root, 'db/schema.rb'), "w:utf-8") do |file|
+        ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection, file)
+      end
     end
 
     def self.generate_models_yml
@@ -39,24 +68,42 @@ module EZ
       unless File.exist?(filename)
         File.open(filename, "w") do |f|
           f.puts <<-EOS
-  # Example table for a typical Book model.
-  #
-  # Book
-  #   title: string
-  #   price: integer
-  #   author: string
-  #   summary: text
-  #   hardcover: boolean
-  #
-  # Indent consistently!  Follow the above syntax exactly.
-  # Typical column choices are: string, text, integer, boolean, date, and datetime.
-  #
-  # Default column values can be specified like this:
-  #    price: integer(0)
-  #    hardcover: boolean(false)
-  #
-  # Have fun!
-
+# Example table for a typical Book model.
+#
+# Book
+#   title: text
+#   author_id: integer
+#   price: integer
+#   summary: text
+#   hardcover: boolean
+#
+# Indent consistently!  Follow the above syntax exactly.
+# Typical column choices are: string, text, integer, boolean, date, time, and datetime.
+#
+#
+# About Default Values
+# ----------------------------------------------------
+# Default column values can be specified like this:
+#    price: integer(0)
+#
+# If not specified, Boolean columns always default to false.
+#
+#
+# Convention-Based Defaults:
+# ----------------------------------------------------
+# You can omit the column type if it's a string, or if it's obviously an integer column:
+#
+#
+# Book
+#   title
+#   author_id
+#   price: integer
+#   summary: text
+#   hardcover: boolean
+#
+# Complete details are in the README file online.
+#
+# Have fun!
   EOS
         end
       end
@@ -96,9 +143,9 @@ module EZ
       @spec = YAML.load(s)
       parse_model_spec
 
-      # puts "@spec:"
-      # puts @spec.inspect
-      # puts "-" * 10
+      puts "@spec:"
+      puts @spec.inspect
+      puts "-" * 10
     end
 
     def load_model_specs(filename = "db/models.yml")
@@ -122,6 +169,11 @@ module EZ
 
         raise msg if msg
 
+        if EZ::Config.timestamps?
+          columns['created_at'] = 'datetime'
+          columns['updated_at'] = 'datetime'
+        end
+        
         columns.each do |column_name, column_type|
           interpret_column_spec column_name, column_type, model
         end

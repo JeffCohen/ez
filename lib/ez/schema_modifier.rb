@@ -172,6 +172,7 @@ module EZ
 
     def remove_dead_tables
       return unless Rails.env.development? || Rails.env.test?
+      return if Dir[File.join(Rails.root, 'db/migrations/*.rb')].entries.any?
 
       tables_we_need = @spec.keys.map { |model| model.tableize }
       dead_tables = tables - tables_we_need

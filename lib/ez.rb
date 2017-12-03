@@ -1,13 +1,16 @@
 require "ez/version"
-require 'ez/domain_modeler.rb'
-require 'ez/model.rb'
+require 'ez/domain_modeler'
+require 'ez/model'
+require 'ez/config'
+require 'ez/rails_updater'
+require 'awesome_print'
 
 require 'hirb' if (Rails.env.development? || Rails.env.test?)
 
 module EZ
   module Console
-    def reload!(print = true)
-      puts "Reloading code..." if print
+    def reload!
+      puts "Reloading code..."
       if Rails::VERSION::MAJOR < 5
         ActionDispatch::Reloader.cleanup!
         ActionDispatch::Reloader.prepare!
@@ -15,18 +18,11 @@ module EZ
         Rails.application.reloader.reload!
       end
 
-      puts "Updating tables (if necessary) ..." if print
-      old_level = ActiveRecord::Base.logger.level
-      ActiveRecord::Base.logger.level = Logger::WARN
-      EZ::DomainModeler.generate_models_yml
-      EZ::DomainModeler.update_tables
-      EZ::DomainModeler.dump_schema
-      puts "Models: #{EZ::DomainModeler.models.to_sentence}"
-      ActiveRecord::Base.logger.level = old_level
       true
     end
   end
 end
+
 
 module EZ
 
@@ -37,46 +33,43 @@ module EZ
     end
 
     console do |app|
-      Rails::ConsoleMethods.send :prepend, EZ::Console
+      # Rails::ConsoleMethods.send :prepend, EZ::Console
+      AwesomePrint.irb!
+
       Hirb.enable(pager: false) if (Rails.env.development? || Rails.env.test?) && defined?(Hirb)
 
-      old_level = ActiveRecord::Base.logger.level
-      ActiveRecord::Base.logger.level = Logger::WARN
-      EZ::DomainModeler.generate_models_yml
-      EZ::DomainModeler.update_tables(true)
-      ActiveRecord::Base.logger.level = old_level
-
       I18n.enforce_available_locales = false
-      puts "Welcome to the Rails Console."
-      puts "-" * 60
-      puts
+
       models = EZ::DomainModeler.models
+      puts
       if models.any?
-        puts "Models: #{models.to_sentence}"
+        puts "Models: #{models.to_sentence}" if models.any?
         puts
-        puts "Use this console to add, update, and delete rows from the database."
-        puts
-        puts "HINTS:"
-        puts "* Type 'exit' (or press Ctrl-D) to when you're done."
-        puts "* Press Ctrl-C if things seem to get stuck."
-        puts "* Use the up/down arrows to repeat commands."
-        puts "* Type the name of a Model to see what columns it has." if models.any?
+        puts "Use this console to create, read, update, and delete rows from the database."
         puts
       end
-
+      puts "HINTS:"
+      puts "* Type 'exit' (or press CTRL-D) when you're done."
+      puts "* Press Ctrl-C if things seem to get stuck."
+      puts "* Use the up/down arrows to repeat commands."
+      puts "* Type the name of a Model to see what columns it has." if models.any?
+      puts
     end
 
     initializer "ez" do
 
-      # tables = ActiveRecord::Base.connection.data_sources - ['schema_migrations', 'ar_internal_metadata']
-      # models.each { |m| m.constantize.magic_associations }
-      # Rails.application.routes.draw do
-      #   tables.each do |table_name|
-      #     resources table_name.to_sym
-      #   end
-      # end
+      if Rails::VERSION::MAJOR < 5
+        ActionDispatch::Reloader.to_prepare do
+          DomainModeler.automigrate
+        end
+      else
+        ActiveSupport::Reloader.to_prepare do
+          DomainModeler.automigrate
+        end
+      end
 
       if (Rails.env.development? || Rails.env.test?)
+
         module ::Hirb
           # A Formatter object formats an output object (using Formatter.format_output) into a string based on the views defined
           # for its class and/or ancestry.

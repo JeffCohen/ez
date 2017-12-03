@@ -18,6 +18,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = []
   spec.require_paths = ["lib"]
 
+  spec.add_runtime_dependency 'awesome_print'
   spec.add_runtime_dependency 'hirb', '~> 0.7'
 
   spec.add_development_dependency "bundler", "~> 1.3"
