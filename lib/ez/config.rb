@@ -21,7 +21,14 @@ module EZ
     end
 
     def self.filename
-      File.join(Rails.root, '.ez')
+      @filename = begin
+        n = File.join(Rails.root, '.ez')
+        if File.exist?(n)
+          n
+        else
+          File.expand_path('~/.ez')
+        end
+      end
     end
 
     def self.configuration

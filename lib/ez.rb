@@ -7,26 +7,28 @@ require 'awesome_print'
 
 require 'hirb' if (Rails.env.development? || Rails.env.test?)
 
-module EZ
-  module Console
-    def reload!
-      puts "Reloading code..."
-      if Rails::VERSION::MAJOR < 5
-        ActionDispatch::Reloader.cleanup!
-        ActionDispatch::Reloader.prepare!
-      else
-        Rails.application.reloader.reload!
-      end
-
-      true
-    end
-  end
-end
+# module EZ
+#   module Console
+#     def reload!
+#       puts "Reloading code..."
+#       if Rails::VERSION::MAJOR < 5
+#         ActionDispatch::Reloader.cleanup!
+#         ActionDispatch::Reloader.prepare!
+#       else
+#         Rails.application.reloader.reload!
+#       end
+#
+#       true
+#     end
+#   end
+# end
 
 
 module EZ
 
   class Railtie < Rails::Railtie
+
+    
     rake_tasks do
       load "tasks/ez_tasks.rake"
       Rake::Task["db:migrate"].enhance ["ez:tables"]
