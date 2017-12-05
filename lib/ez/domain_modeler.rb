@@ -20,6 +20,12 @@ module EZ
       tables.map { |t| t.classify }
     end
 
+    def self.should_migrate?
+      !(Rails.env.development? || Rails.env.test?) ||
+       (!File.exist?(schema_rb)) ||
+       (File.mtime(schema_rb) < File.mtime(models_yml)))
+    end
+
     def self.automigrate
       return unless EZ::Config.models?
 
@@ -29,7 +35,7 @@ module EZ
 
         EZ::DomainModeler.generate_models_yml unless File.exist?(models_yml)
 
-        if !File.exist?(schema_rb) || (File.mtime(schema_rb) < File.mtime(models_yml))
+        if should_migrate?
           old_level = ActiveRecord::Base.logger.level
 
           ActiveRecord::Base.logger.level = Logger::WARN
@@ -37,7 +43,7 @@ module EZ
           dump_schema if (Rails.env.development? || Rails.env.test?)
 
           ActiveRecord::Base.logger.level = old_level
-          EZ::RailsUpdater.update!
+          EZ::RailsUpdater.update! if Rails.env.development?
         end
       rescue => e
         puts "Exception: #{e}"

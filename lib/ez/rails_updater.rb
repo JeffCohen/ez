@@ -8,6 +8,8 @@ module EZ
     VIEWS = %w(index show destroy new create edit update)
 
     def self.update!
+      return unless Rails.env.development?
+
       EZ::DomainModeler.tables.each do |table|
         create_controller(table) if EZ::Config.controllers?
         create_view_folder(table) if EZ::Config.views?
@@ -16,6 +18,8 @@ module EZ
     end
 
     def self.create_routes(table)
+      return unless Rails.env.development?
+
       filename = File.join(Rails.root, 'config', 'routes.rb')
       line = "  resources :#{table}"
       routes = File.read(filename)
@@ -28,6 +32,8 @@ module EZ
     end
 
     def self.create_controller(controller)
+      return unless Rails.env.development?
+
       filename = File.join(Rails.root, 'app', 'controllers', "#{controller}_controller.rb")
       if !File.exist?(filename)
         File.open(filename, "w:utf-8") do |file|
@@ -45,6 +51,8 @@ module EZ
     end
 
     def self.create_view_folder(folder)
+      return unless Rails.env.development?
+      
       full_path = File.join(Rails.root, 'app', 'views', folder)
       FileUtils.mkdir_p(full_path)
       VIEWS.each do |view|
