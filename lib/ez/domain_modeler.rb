@@ -23,7 +23,7 @@ module EZ
     def self.should_migrate?
       !(Rails.env.development? || Rails.env.test?) ||
        (!File.exist?(schema_rb)) ||
-       (File.mtime(schema_rb) < File.mtime(models_yml)))
+       (File.mtime(schema_rb) < File.mtime(models_yml))
     end
 
     def self.automigrate
