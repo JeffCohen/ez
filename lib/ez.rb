@@ -2,9 +2,7 @@ require "ez/version"
 require 'ez/domain_modeler'
 require 'ez/model'
 require 'ez/config'
-require 'ez/rails_updater'
-require 'awesome_print'
-
+require 'awesome_print' if (Rails.env.development? || Rails.env.test?)
 require 'hirb' if (Rails.env.development? || Rails.env.test?)
 
 module EZ
@@ -17,7 +15,7 @@ module EZ
     end
 
     console do |app|
-      AwesomePrint.irb!
+      AwesomePrint.irb! if (Rails.env.development? || Rails.env.test?)
 
       Hirb.enable(pager: false) if (Rails.env.development? || Rails.env.test?) && defined?(Hirb)
 

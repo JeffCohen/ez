@@ -1,4 +1,5 @@
 require_relative 'schema_modifier'
+require_relative 'rails_updater'
 
 module EZ
 
@@ -20,7 +21,8 @@ module EZ
       tables.map { |t| t.classify }
     end
 
-    def self.should_migrate?
+    def self.should_migrate?(models_yml)
+      schema_rb = File.join(Rails.root, 'db', 'schema.rb')
       !(Rails.env.development? || Rails.env.test?) ||
        (!File.exist?(schema_rb)) ||
        (File.mtime(schema_rb) < File.mtime(models_yml))
@@ -31,11 +33,9 @@ module EZ
 
       begin
         models_yml = File.join(Rails.root, 'db', 'models.yml')
-        schema_rb = File.join(Rails.root, 'db', 'schema.rb')
-
         EZ::DomainModeler.generate_models_yml unless File.exist?(models_yml)
 
-        if should_migrate?
+        if should_migrate?(models_yml)
           old_level = ActiveRecord::Base.logger.level
 
           ActiveRecord::Base.logger.level = Logger::WARN
@@ -71,6 +71,8 @@ module EZ
     end
 
     def self.generate_models_yml
+      return unless Rails.env.development?
+
       filename = Rails.root + "db/models.yml"
       unless File.exist?(filename)
         File.open(filename, "w") do |f|
