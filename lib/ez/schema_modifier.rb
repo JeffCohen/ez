@@ -137,6 +137,7 @@ module EZ
 
     def remove_dead_schema
       return unless Rails.env.development? || Rails.env.test?
+      return if Dir[File.join(Rails.root, 'db/migrate/*.rb')].entries.any?
 
       remove_dead_tables
       remove_dead_columns
