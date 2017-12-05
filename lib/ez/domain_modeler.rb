@@ -21,25 +21,26 @@ module EZ
     end
 
     def self.automigrate
-      if EZ::Config.models?
+      return unless EZ::Config.models?
+
+      begin
         models_yml = File.join(Rails.root, 'db', 'models.yml')
         schema_rb = File.join(Rails.root, 'db', 'schema.rb')
 
         EZ::DomainModeler.generate_models_yml unless File.exist?(models_yml)
 
         if !File.exist?(schema_rb) || (File.mtime(schema_rb) < File.mtime(models_yml))
-          puts "Updating your app based on models.yml..."
           old_level = ActiveRecord::Base.logger.level
-          ActiveRecord::Base.logger.level = Logger::WARN
 
+          ActiveRecord::Base.logger.level = Logger::WARN
           EZ::DomainModeler.update_tables
           dump_schema if (Rails.env.development? || Rails.env.test?)
-          puts "Models: #{EZ::DomainModeler.models.to_sentence}"
+
           ActiveRecord::Base.logger.level = old_level
+          EZ::RailsUpdater.update!
         end
-
-        EZ::RailsUpdater.update!
-
+      rescue => e
+        puts "Exception: #{e}"
       end
     end
 
@@ -68,37 +69,36 @@ module EZ
       unless File.exist?(filename)
         File.open(filename, "w") do |f|
           f.puts <<-EOS
-# Example table for a typical Book model.
+# Example:
 #
 # Book
 #   title: text
 #   author_id: integer
-#   price: integer
 #   summary: text
+#   price: integer
 #   hardcover: boolean
 #
+#
 # Indent consistently!  Follow the above syntax exactly.
-# Typical column choices are: string, text, integer, boolean, date, time, and datetime.
 #
 #
-# About Default Values
-# ----------------------------------------------------
-# Default column values can be specified like this:
+#
+# Column choices are: text, integer, boolean, datetime, and float.
+#
+#
+# Default values can be specified like this:
+#
 #    price: integer(0)
 #
 # If not specified, Boolean columns always default to false.
 #
-#
-# Convention-Based Defaults:
-# ----------------------------------------------------
-# You can omit the column type if it's a string, or if it's obviously an integer column:
-#
+# You can omit the column type if it's a text column or obviously an integer column:
 #
 # Book
 #   title
 #   author_id
+#   summary
 #   price: integer
-#   summary: text
 #   hardcover: boolean
 #
 # Complete details are in the README file online.
@@ -143,9 +143,9 @@ module EZ
       @spec = YAML.load(s)
       parse_model_spec
 
-      puts "@spec:"
-      puts @spec.inspect
-      puts "-" * 10
+      # puts "@spec:"
+      # puts @spec.inspect
+      # puts "-" * 10
     end
 
     def load_model_specs(filename = "db/models.yml")
@@ -173,7 +173,7 @@ module EZ
           columns['created_at'] = 'datetime'
           columns['updated_at'] = 'datetime'
         end
-        
+
         columns.each do |column_name, column_type|
           interpret_column_spec column_name, column_type, model
         end
@@ -192,7 +192,7 @@ module EZ
         elsif column_name =~ /\?$/
           'boolean'
         else
-          'string'
+          'text'
         end
       end
 

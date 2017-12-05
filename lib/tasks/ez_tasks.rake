@@ -1,7 +1,3 @@
-# Rake::Task["db:migrate"].enhance do
-#   Rake::Task["ez:resources"].invoke
-# end
-
 namespace :db do
 
   namespace :migrate do
@@ -22,7 +18,7 @@ namespace :ez do
 
   desc "Generate models.yml if it doesn't exist yet."
   task :generate_yml do
-    EZ::DomainModeler.generate_yml
+    EZ::DomainModeler.generate_models_yml
   end
 
   desc "Erases all data, and builds all table schema from scratch."

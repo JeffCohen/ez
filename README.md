@@ -1,56 +1,57 @@
 # EZ
 
-**Version 1.5.0.3**
+Easy domain modeling in Rails without migrations.  
+
+**Version 1.9.3**
 
 *For educational purposes only.*
 
-Tested against Rails 5.1.1.
+Tested against Rails 5.1.4.
 
 _NOTE: For Rails < 5.0, use version 1.3_.
 
-Easy domain modeling in Rails without migrations.  
+### Highlights
 
-* Applies instant schema changes based on a file named `db/models.yml`.  
-* Schema changes applied automatically when code is reloaded.
+* Applies schema changes based on a file named `db/models.yml`.  
+* Schema changes are applied by running `rails server`, `rails console`, or `reload!` in the console.
 * Diffs are determined automatically and applied to the database.  
 * Embraces Rails' column naming conventions by inferring columns types based on the name.
 * Enhances the Rails Console with customized AwesomePrint and Hirb integration
 * Adds two new ActiveRecord methods: `.sample(n = 1)` and `.none?`
 
 
-## Usage
+### Installation
 
 ```ruby
 gem 'ez'
 ```
 
-Then start your server or console to force the initial generation of
-`db/models.yml` and a configuation file named `.ez`.
+Start the server or console to force the initial generation of
+`db/models.yml` and a hidden configuration file named `.ez`.
 
 Alternatively, you can run `rails db:migrate` to generate these files without running your app.
 
-## Get Started
+### Usage
 
-1. Use `db/models.yml` to define your schema. Database schema changes are applied directly and triggered automatically in development mode.  (`rails db:migrate` will also trigger the changes).  Foreign-key indexes will be generated automatically.
-
-2. Run `rails db:migrate:preview` to do a "dry run" and see what would change based your `db/models.yml` file.
-
-
-2. Use the `.ez` file to control functionality.
+1. Use `db/models.yml` to define your schema. Database schema changes are applied directly without affecting migrations.  (`rails db:migrate` will also trigger the changes).
+2. Foreign-key indexes are generated automatically.
+3. Use `rails db:migrate:preview` to perform a "dry run" based your `db/models.yml` file.
+4. Use the `.ez` file to control functionality.
+5. See the section on Migrations below.
 
 
 |Config setting|Default|Description|
 |----|----|----|
 |models|true|Watches `models.yml` for changes.  Set to `false` to turn off all functionality|
+|timestamps|true|Generates `created_at` and `updated_at` columns on every model.
 |restful_routes|true|Adds `resources :<tablename>` to routes.rb for each model|
 |controllers|true|Generates one controller per model with 7 empty methods.
 |views|true|Generates the view folder for each model, with 7 empty views.
-|timestamps|true|Generates `created_at` and `updated_at` columns on every model.
 
 
 ## Syntax Guide for `db/models.yml`**
 
-It's just YAML.  We recommend `text` instead of `string` columns but both are supported.
+It's just YAML.  We recommend `text` instead of `string` columns (because of recent SQLite3 changes) but both are supported.
 
 ```
 Book:
@@ -115,17 +116,33 @@ Author
 * Boolean columns are assumed to be given a default of `false` if not otherwise specified.
 
 
-### 2. ActiveRecord Enhancements
+### ActiveRecord Enhancements
 
-* Adds `.sample` method to choose a random row.
-* Adds `.to_ez` to generate a snippet from legacy models that you can paste into models.yml.
+* `.sample` method to choose a random row, or `.sample(5)` for five sample rows.
+* `.none?` method on a collection: `Product.where(in_stock: true).none?`
+* `.to_ez` to generate a snippet from legacy models that you can paste into models.yml.
 
 
-### 3. Beginner-friendly "It Just Works" console
+### Beginner-friendly Rails Console
 
-* Solves the "no connection" message in Rails >= 4.0.1 (if you try to inspect a model without making a query first) by establishing an initial connection to the development database.
 * Shows helpful instructions when console starts, including the list of model classes found in the application.
-* Activates AwesomePrint in the Rails consol.
+* Solves the "no connection" message in Rails >= 4.0.1 (if you try to inspect a model without making a query first) by establishing an initial connection to the development database.
+* Activates AwesomePrint.
 * Uses Hirb for table-like display.
 * Configures Hirb to allow nice table output for `ActiveRecord::Relation` collections
 * Configures Hirb to produce hash-like output for single ActiveRecord objects
+
+
+### Migrations
+
+This gem is expecting that the student will not use database migrations
+to control the schema.  However, it is ok to use a combination of migrations
+and `models.yml`, but be aware of the following:
+
+* If at least one migration file is detected, this gem will stop
+removing tables that are removed from `models.yml` since
+it's not possible to know if there's a migration for it or not.
+* Where possible, it's best to translate a migration required for
+a third-party gem (say, for Devise) into an entry in models.yml
+so that everything is managed in one place.
+Pull requests for integrating such features into `ez` are encouraged.

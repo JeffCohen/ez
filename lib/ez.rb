@@ -7,35 +7,16 @@ require 'awesome_print'
 
 require 'hirb' if (Rails.env.development? || Rails.env.test?)
 
-# module EZ
-#   module Console
-#     def reload!
-#       puts "Reloading code..."
-#       if Rails::VERSION::MAJOR < 5
-#         ActionDispatch::Reloader.cleanup!
-#         ActionDispatch::Reloader.prepare!
-#       else
-#         Rails.application.reloader.reload!
-#       end
-#
-#       true
-#     end
-#   end
-# end
-
-
 module EZ
 
   class Railtie < Rails::Railtie
 
-    
     rake_tasks do
       load "tasks/ez_tasks.rake"
       Rake::Task["db:migrate"].enhance ["ez:tables"]
     end
 
     console do |app|
-      # Rails::ConsoleMethods.send :prepend, EZ::Console
       AwesomePrint.irb!
 
       Hirb.enable(pager: false) if (Rails.env.development? || Rails.env.test?) && defined?(Hirb)
@@ -44,17 +25,18 @@ module EZ
 
       models = EZ::DomainModeler.models
       puts
-      if models.any?
-        puts "Models: #{models.to_sentence}" if models.any?
-        puts
-        puts "Use this console to create, read, update, and delete rows from the database."
-        puts
-      end
-      puts "HINTS:"
+      puts "Rails Console"
+      puts "-" * 50
       puts "* Type 'exit' (or press CTRL-D) when you're done."
       puts "* Press Ctrl-C if things seem to get stuck."
       puts "* Use the up/down arrows to repeat commands."
-      puts "* Type the name of a Model to see what columns it has." if models.any?
+      puts
+      if models.any?
+        puts "Models: #{models.to_sentence}"
+        puts
+        puts "Use this console to create, read, update, and delete rows from the database."
+        puts "Or simply type the name of a model to see what columns it has."
+      end
       puts
     end
 
