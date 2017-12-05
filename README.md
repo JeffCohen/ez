@@ -2,7 +2,7 @@
 
 Easy domain modeling in Rails without migrations.  
 
-**Version 1.9.3**
+**Version 1.9.4**
 
 *For educational purposes only.*
 
@@ -47,6 +47,17 @@ Alternatively, you can run `rails db:migrate` to generate these files without ru
 |restful_routes|true|Adds `resources :<tablename>` to routes.rb for each model|
 |controllers|true|Generates one controller per model with 7 empty methods.
 |views|true|Generates the view folder for each model, with 7 empty views.
+
+## Development vs Production
+
+Renaming a column in `db/models.yml` appear to the gem as if you dropped
+the old column and created a new column.  **You will lose any data you
+had in that column**.  Same goes for renaming models: the old table
+will be dropped.
+
+In production, this could be catastrophic.  Therefore, this gem will
+not delete tables or columns in production, only add tables and add
+columns.  This could be problematic but is hopefully the 1% case.
 
 
 ## Syntax Guide for `db/models.yml`**
@@ -136,12 +147,12 @@ Author
 ### Migrations
 
 This gem is expecting that the student will not use database migrations
-to control the schema.  However, it is ok to use a combination of migrations
+to control the schema.  It is ok to use both migrations
 and `models.yml`, but be aware of the following:
 
-* If at least one migration file is detected, this gem will stop
-removing tables that are removed from `models.yml` since
-it's not possible to know if there's a migration for it or not.
+* If at least one migration file is detected, this gem will not
+removing tables that would normally removed via `models.yml` since
+it's not possible to know if the table is supposed to be there or not.
 * Where possible, it's best to translate a migration required for
 a third-party gem (say, for Devise) into an entry in models.yml
 so that everything is managed in one place.
