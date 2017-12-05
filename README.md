@@ -60,7 +60,7 @@ not delete tables or columns in production, only add tables and add
 columns.  This could be problematic but is hopefully the 1% case.
 
 
-## Syntax Guide for `db/models.yml`**
+## Syntax Guide for `db/models.yml`
 
 It's just YAML.  We recommend `text` instead of `string` columns (because of recent SQLite3 changes) but both are supported.
 
