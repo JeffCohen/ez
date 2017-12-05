@@ -18,10 +18,9 @@ Gem::Specification.new do |spec|
   spec.test_files    = []
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency 'awesome_print'
+  spec.add_runtime_dependency 'awesome_print', '~> 1.8', '>= 1.8.0'
   spec.add_runtime_dependency 'hirb', '~> 0.7'
 
-  spec.add_development_dependency "byebug", "~> 9.1.0"
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake", '~> 10.0', '>= 10.0.0'
 end
