@@ -52,13 +52,13 @@ module EZ
 
     def self.create_view_folder(folder)
       return unless Rails.env.development?
-      
+
       full_path = File.join(Rails.root, 'app', 'views', folder)
       FileUtils.mkdir_p(full_path)
       VIEWS.each do |view|
         File.open(File.join(full_path, "#{view}.html.erb"), "w:utf-8") do |file|
-          file.puts "<h1>This is a temporary page.</h1>"
-          file.puts "<p>To modify this page, edit the template at <code>app/views/#{folder}/#{file}.html.erb</p>"
+          file.puts "<h1>This is a placeholder page.</h1>"
+          file.puts "<p>To modify this page, edit the template at <code>app/views/#{folder}/#{view}.html.erb</p>"
         end
       end
     end
