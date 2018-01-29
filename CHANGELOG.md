@@ -1,3 +1,7 @@
+*Version 1.9.7*
+
+- Automatic routes/controllers/views are turned off by default.  Modify the .ez file to override.
+
 *Version 1.5.0.4*
 - Use `ApplicationRecord` as the model base class for Rails version >= 5
 

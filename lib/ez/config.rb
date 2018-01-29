@@ -3,9 +3,9 @@ module EZ
   class Config
 
     DEFAULTS = { "models" => true,
-                 "restful_routes" => true,
-                 "controllers" => true,
-                 "views" => true,
+                 "restful_routes" => false,
+                 "controllers" => false,
+                 "views" => false,
                  "timestamps" => true
                }
 

@@ -2,7 +2,7 @@
 
 Easy domain modeling in Rails without migrations.  
 
-**Version 1.9.6**
+**Version 1.9.7**
 
 *For educational purposes only.*
 
