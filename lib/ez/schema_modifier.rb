@@ -31,7 +31,7 @@ module EZ
       if @changed
         puts "\n(No changes were actually made)" if @dry_run
       else
-          puts "All tables are up-to-date."
+          # puts "All tables are up-to-date."
         if @dry_run
           puts "\nNo changes would be made."
         end

@@ -2,7 +2,7 @@
 
 Easy domain modeling in Rails without migrations.  
 
-**Version 1.9.4**
+**Version 1.9.6**
 
 *For educational purposes only.*
 
@@ -13,9 +13,10 @@ _NOTE: For Rails < 5.0, use version 1.3_.
 ### Highlights
 
 * Applies schema changes based on a file named `db/models.yml`.  
-* Schema changes are applied by running `rails server`, `rails console`, or `reload!` in the console.
-* Diffs are determined automatically and applied to the database.  
-* Embraces Rails' column naming conventions by inferring columns types based on the name.
+* Schema migrations are determined automatically and applied to the database.  
+* Optionally generates routes, controllers, and/or views based on the models.  
+* Schema migrations are applied by running `rails server`, `rails console`, or by typing `reload!` in the console.  `rails db:migrate` is not affected.
+* Embraces Rails column naming conventions by inferring columns types based on the name.
 * Enhances the Rails Console with customized AwesomePrint and Hirb integration
 * Adds two new ActiveRecord methods: `.sample(n = 1)` and `.none?`
 
@@ -27,11 +28,14 @@ gem 'ez'
 ```
 
 Start the server or console to force the initial generation of
-`db/models.yml` and a hidden configuration file named `.ez`.
+`db/models.yml`.
 
-Alternatively, you can run `rails db:migrate` to generate these files without running your app.
+If a file named `.ez` in the project directory is present, or in the user's home folder,
+it controls the behavior of the gem.
 
-### Usage
+Alternatively, you can run `rails ez:generate_yml` to generate these files without running your app.
+
+### Usage and Configuration
 
 1. Use `db/models.yml` to define your schema. Database schema changes are applied directly without affecting migrations.  (`rails db:migrate` will also trigger the changes).
 2. Foreign-key indexes are generated automatically.
@@ -48,7 +52,7 @@ Alternatively, you can run `rails db:migrate` to generate these files without ru
 |controllers|true|Generates one controller per model with 7 empty methods.
 |views|true|Generates the view folder for each model, with 7 empty views.
 
-## Development vs Production
+## WARNING! Development vs Production
 
 Renaming a column in `db/models.yml` appear to the gem as if you dropped
 the old column and created a new column.  **You will lose any data you
@@ -56,8 +60,9 @@ had in that column**.  Same goes for renaming models: the old table
 will be dropped.
 
 In production, this could be catastrophic.  Therefore, this gem will
-not delete tables or columns in production, only add tables and add
-columns.  This could be problematic but is hopefully the 1% case.
+**not delete tables or columns in production**, but only add tables and add
+columns.  This could be problematic for apps that need to drop tables
+or columns from the production database, but this hopefully an edge case.
 
 
 ## Syntax Guide for `db/models.yml`
@@ -151,9 +156,20 @@ to control the schema.  It is ok to use both migrations
 and `models.yml`, but be aware of the following:
 
 * If at least one migration file is detected, this gem will not
-removing tables that would normally removed via `models.yml` since
-it's not possible to know if the table is supposed to be there or not.
-* Where possible, it's best to translate a migration required for
+remove tables in development mode that would normally removed via `models.yml` because
+it is not possible to know if the table is controlled by migrations or not.
+* Wherever possible, it's best to translate a migration required for
 a third-party gem (say, for Devise) into an entry in models.yml
 so that everything is managed in one place.
-Pull requests for integrating such features into `ez` are encouraged.
+* Pull requests for integrating new features into `ez` are encouraged.
+
+### Switching To Rails Migrations
+
+There will (hopefully) come a time when the student wishes to graduate to
+proper database migrations, probably for managing a production application.
+To switch to normal Rails migrations:
+
+1. Remove the `ez` gem and run `bundle install`
+2. Delete any `.ez` file in the project root
+
+From this point forward, migrations can be used as expected.
