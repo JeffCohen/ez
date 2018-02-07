@@ -21,11 +21,15 @@ module EZ
       tables.map { |t| t.classify }
     end
 
-    def self.should_migrate?(models_yml)
+    def self.should_migrate?(models_yml = nil)
+      models_yml ||= File.join(Rails.root, 'db', 'models.yml')
+      return false unless File.exist?(models_yml)
+
       schema_rb = File.join(Rails.root, 'db', 'schema.rb')
+      sqlite_db = File.join(Rails.root, 'db', "#{Rails.env}.sqlite3")
       !(Rails.env.development? || Rails.env.test?) ||
-       (!File.exist?(schema_rb)) ||
-       (File.mtime(schema_rb) < File.mtime(models_yml))
+        (!File.exist?(schema_rb) || (File.mtime(schema_rb) < File.mtime(models_yml))) ||
+          (!File.exist?(sqlite_db) || (File.mtime(sqlite_db) < File.mtime(models_yml)))
     end
 
     def self.automigrate
