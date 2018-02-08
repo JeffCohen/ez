@@ -56,7 +56,7 @@ module EZ
       full_path = File.join(Rails.root, 'app', 'views', folder)
       FileUtils.mkdir_p(full_path)
       VIEWS.each do |view|
-        filename = File.join(full_path, "#{view}.html.erb"
+        filename = File.join(full_path, "#{view}.html.erb")
         if !File.exist?(filename)
           File.open(filename, "w:utf-8") do |file|
             file.puts "<h1>This is a placeholder page.</h1>"
