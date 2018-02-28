@@ -1,3 +1,7 @@
+*Version 2.0.0*
+
+- Fixed issues with .ez options for updating routes and controllers
+
 *Version 1.9.7*
 
 - Automatic routes/controllers/views are turned off by default.  Modify the .ez file to override.

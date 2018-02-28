@@ -24,9 +24,8 @@ module EZ
       line = "  resources :#{table}"
       routes = File.read(filename)
       if !routes.index(line)
-        line = "#{line}\n"
         routes.sub!(/^\s*\# For details on the DSL available.+$/,'')
-        routes.sub!(/^(.+routes.draw do\s*)$/, '\1' + line)
+        routes.sub!(/^(.+routes.draw do\s*)$/, '\1' + "\n#{line}\n")
         File.open(filename, "wb") { |file| file.write(routes) }
       end
     end
@@ -60,7 +59,7 @@ module EZ
         if !File.exist?(filename)
           File.open(filename, "w:utf-8") do |file|
             file.puts "<h1>This is a placeholder page.</h1>"
-            file.puts "<p>To modify this page, edit the template at <code>app/views/#{folder}/#{view}.html.erb</p>"
+            file.puts "<p>To modify this page, edit the template at <code>app/views/#{folder}/#{view}.html.erb</code></p>"
           end
         end
       end
